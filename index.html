@@ -384,17 +384,53 @@ function dispatch(action) {
 
 /* ═══════════════════════════
    DICTIONARY  (runs on submitting player's device)
+   Uses two APIs in sequence — only rejects if BOTH say no.
+   This eliminates false negatives from either API alone.
 ═══════════════════════════ */
 const wordCache = {};
 async function isRealWord(word) {
   if (word in wordCache) return wordCache[word];
-  try {
+
+  // API 1: Free Dictionary API
+  const check1 = async () => {
     const r = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`
     );
-    return (wordCache[word] = r.ok);
+    return r.ok;
+  };
+
+  // API 2: Datamuse — returns array of matches, empty = not a word
+  const check2 = async () => {
+    const r = await fetch(
+      `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&max=1`
+    );
+    const data = await r.json();
+    // Datamuse returns exact match only when the first result matches exactly
+    return Array.isArray(data) && data.length > 0 && data[0].word === word;
+  };
+
+  try {
+    // Run both in parallel
+    const [result1, result2] = await Promise.all([
+      check1().catch(() => null), // null = error, treat as unknown
+      check2().catch(() => null)
+    ]);
+
+    // Accept if EITHER API confirms it's real
+    // Only reject if both APIs definitively say no (not null/error)
+    let valid;
+    if (result1 === true || result2 === true) {
+      valid = true;
+    } else if (result1 === false && result2 === false) {
+      valid = false;
+    } else {
+      // One or both APIs errored — if one confirmed false and other errored,
+      // give benefit of the doubt and accept
+      valid = true;
+    }
+
+    return (wordCache[word] = valid);
   } catch {
-    // Network error (offline, DNS failure, etc.) — re-throw so doPlay can handle it
     throw new Error("network");
   }
 }
