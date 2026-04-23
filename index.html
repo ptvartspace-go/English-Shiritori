@@ -4,397 +4,566 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>English Shiritori</title>
-<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #f2f1ed;
-  --surface: #ffffff;
-  --border: #e0dfd8;
-  --text: #181816;
-  --muted: #888884;
-  --faint: #c8c7c0;
-  --danger: #a32d2d;
-  --danger-bg: #fdf0f0;
+  --bg:#f2f1ed; --surface:#fff; --border:#e0dfd8; --text:#181816;
+  --muted:#888884; --faint:#c8c7c0; --danger:#a32d2d; --danger-bg:#fdf0f0;
 }
+.c0{--pc:#7f77dd;--pb:#eeedfe;--pbd:#b0a9ee;--pt:#3c3489}
+.c1{--pc:#1d9e75;--pb:#e1f5ee;--pbd:#5dcaa5;--pt:#0f6e56}
+.c2{--pc:#d85a30;--pb:#faece7;--pbd:#f0997b;--pt:#993c1d}
+.c3{--pc:#d4537e;--pb:#fbeaf0;--pbd:#ed93b1;--pt:#72243e}
+.c4{--pc:#ba7517;--pb:#faeeda;--pbd:#ef9f27;--pt:#633806}
+.c5{--pc:#378add;--pb:#e6f1fb;--pbd:#85b7eb;--pt:#0c447c}
+.c6{--pc:#639922;--pb:#eaf3de;--pbd:#97c459;--pt:#27500a}
+.c7{--pc:#533b9b;--pb:#eeebfa;--pbd:#a99de0;--pt:#2d1f6e}
+.c8{--pc:#0f7d8a;--pb:#e0f5f7;--pbd:#5dc8d3;--pt:#065960}
+.c9{--pc:#888780;--pb:#f1efe8;--pbd:#b4b2a9;--pt:#444441}
 
-.c0  { --pc:#7f77dd; --pb:#eeedfe; --pbd:#b0a9ee; --pt:#3c3489; }
-.c1  { --pc:#1d9e75; --pb:#e1f5ee; --pbd:#5dcaa5; --pt:#0f6e56; }
-.c2  { --pc:#d85a30; --pb:#faece7; --pbd:#f0997b; --pt:#993c1d; }
-.c3  { --pc:#d4537e; --pb:#fbeaf0; --pbd:#ed93b1; --pt:#72243e; }
-.c4  { --pc:#ba7517; --pb:#faeeda; --pbd:#ef9f27; --pt:#633806; }
-.c5  { --pc:#378add; --pb:#e6f1fb; --pbd:#85b7eb; --pt:#0c447c; }
-.c6  { --pc:#639922; --pb:#eaf3de; --pbd:#97c459; --pt:#27500a; }
-.c7  { --pc:#533b9b; --pb:#eeebfa; --pbd:#a99de0; --pt:#2d1f6e; }
-.c8  { --pc:#0f7d8a; --pb:#e0f5f7; --pbd:#5dc8d3; --pt:#065960; }
-.c9  { --pc:#888780; --pb:#f1efe8; --pbd:#b4b2a9; --pt:#444441; }
+html,body{min-height:100vh;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text);font-size:16px;line-height:1.5}
+body{display:flex;flex-direction:column;align-items:center;padding:2.5rem 1rem 4rem}
+.site-header{text-align:center;margin-bottom:2rem}
+.site-header h1{font-size:2rem;font-weight:700;letter-spacing:-.03em;margin-bottom:.25rem}
+.site-header p{font-size:.9rem;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:2rem;width:100%;max-width:540px;box-shadow:0 2px 20px rgba(0,0,0,.06)}
+.eyebrow{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
+.rules{background:var(--bg);border-radius:10px;padding:.9rem 1.1rem;font-size:.84rem;color:#555;line-height:1.75;margin-bottom:1.4rem}
+.rules b{color:var(--text);font-weight:600}
 
-html, body { min-height:100vh; background:var(--bg); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--text); font-size:16px; line-height:1.5; }
-body { display:flex; flex-direction:column; align-items:center; padding:2.5rem 1rem 4rem; }
+input[type=text]{width:100%;padding:.6rem .9rem;font-size:1rem;border:1px solid var(--border);border-radius:9px;outline:none;background:var(--surface);color:var(--text);transition:border-color .15s,box-shadow .15s;font-family:inherit}
+input[type=text]:focus{border-color:#7f77dd;box-shadow:0 0 0 3px rgba(127,119,221,.15)}
+input[type=text]:disabled{background:var(--bg);color:var(--muted);cursor:not-allowed}
 
-.site-header { text-align:center; margin-bottom:2rem; }
-.site-header h1 { font-size:2rem; font-weight:700; letter-spacing:-0.03em; margin-bottom:0.25rem; }
-.site-header p { font-size:0.9rem; color:var(--muted); }
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:.65rem 1.25rem;font-size:.95rem;font-weight:500;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:background .12s,transform .08s;font-family:inherit;width:100%}
+.btn:hover{background:#eceae4}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.38;cursor:not-allowed;transform:none}
+.btn-primary{background:#7f77dd;color:#fff;border-color:#7f77dd}
+.btn-primary:hover{background:#6a62cc;border-color:#6a62cc}
+.btn-sm{width:auto;padding:.5rem .9rem;font-size:.86rem}
+.btn-ghost{font-size:.82rem;color:var(--danger);border-color:#f5c4c4;background:var(--danger-bg)}
+.btn-ghost:hover{background:#fce0e0}
+hr{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
 
-.card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:2rem; width:100%; max-width:540px; box-shadow:0 2px 20px rgba(0,0,0,0.06); }
+/* status bar */
+.status-bar{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted);margin-bottom:1rem;min-height:1.2rem}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex-shrink:0;transition:background .3s}
+.status-dot.ok{background:#1d9e75}
+.status-dot.warn{background:#ba7517;animation:blink .8s ease-in-out infinite}
+.status-dot.err{background:var(--danger)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-.eyebrow { font-size:0.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem; }
+/* lobby */
+.name-row{display:flex;gap:.6rem;margin-bottom:1rem}
+.name-row input{flex:1}
+.invite-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1.25rem}
+.inv-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
+.inv-desc{font-size:.84rem;color:#555;margin-bottom:.7rem;line-height:1.6}
+.link-row{display:flex;align-items:center;gap:.5rem}
+.link-row span{flex:1;font-size:.75rem;font-family:"Courier New",monospace;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:.35rem .6rem}
+.link-copy{flex-shrink:0;font-size:.8rem;padding:.38rem .85rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit;color:var(--text);font-weight:500;transition:background .12s}
+.link-copy:hover{background:#e5e3dc}
+.player-list{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1rem}
+.player-row{display:flex;align-items:center;gap:.65rem;padding:.55rem .8rem;border-radius:10px;font-size:.9rem}
+.player-row .p-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:var(--pc)}
+.player-row .p-name{flex:1;font-weight:500}
+.player-row .p-badge{font-size:.72rem;font-weight:600;color:var(--pt);background:var(--pb);border:1px solid var(--pbd);border-radius:20px;padding:.15rem .55rem}
+.player-row.empty{background:var(--bg);color:var(--faint);font-style:italic;font-size:.85rem}
+.player-row.filled{background:var(--pb);color:var(--pt)}
+.slots-note{font-size:.8rem;color:var(--muted);text-align:center;margin-bottom:.75rem}
+.waiting-row{display:flex;align-items:center;gap:.6rem;font-size:.84rem;color:var(--muted);margin-top:.75rem}
+.pulse{width:8px;height:8px;border-radius:50%;background:#1d9e75;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
 
-.rules { background:var(--bg); border-radius:10px; padding:0.9rem 1.1rem; font-size:0.84rem; color:#555; line-height:1.75; margin-bottom:1.4rem; }
-.rules b { color:var(--text); font-weight:600; }
+/* game */
+.scoreboard{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.25rem}
+.score-row{display:flex;align-items:center;gap:.6rem;padding:.45rem .75rem;border-radius:9px;font-size:.88rem}
+.score-row .s-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:var(--pc)}
+.score-row .s-name{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score-row .s-words{font-weight:700;font-size:1rem;color:var(--pt)}
+.score-row.active-turn{background:var(--pb);border:1px solid var(--pbd)}
+.score-row.eliminated{opacity:.4;text-decoration:line-through}
+.turn-banner{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;border-radius:10px;margin-bottom:1.25rem;font-size:.92rem;font-weight:600;background:var(--pb);border:1px solid var(--pbd);color:var(--pt)}
+.turn-dot{width:9px;height:9px;border-radius:50%;background:var(--pc)}
+.chain-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
+.chain-wrap{min-height:58px;background:var(--bg);border-radius:10px;padding:.65rem .85rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;align-items:center;gap:.3rem}
+.chain-empty{font-size:.85rem;color:var(--faint)}
+.chip{font-size:.82rem;font-weight:500;padding:.18rem .55rem;border-radius:20px;border:1px solid var(--pbd);background:var(--pb);color:var(--pt)}
+.arr{font-size:.68rem;color:var(--faint)}
+.req-letter{text-align:center;font-size:.88rem;color:var(--muted);margin-bottom:1rem}
+.letter-badge{display:inline-block;font-size:1.35rem;font-weight:700;background:#eeedfe;color:#3c3489;border:1.5px solid #b0a9ee;border-radius:9px;padding:.1rem .7rem;margin-left:.4rem;line-height:1.5}
+.input-row{display:flex;gap:.5rem;margin-bottom:.45rem}
+.error{font-size:.83rem;color:var(--danger);min-height:1.2rem;text-align:center;margin-bottom:.5rem}
+.checking{display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.83rem;color:var(--muted);min-height:1.2rem;margin-bottom:.5rem}
+.spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:#7f77dd;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.action-row{display:flex;gap:.5rem;margin-bottom:.25rem}
+.action-row .btn{font-size:.85rem}
 
-input[type="text"] { width:100%; padding:0.6rem 0.9rem; font-size:1rem; border:1px solid var(--border); border-radius:9px; outline:none; background:var(--surface); color:var(--text); transition:border-color 0.15s,box-shadow 0.15s; font-family:inherit; }
-input[type="text"]:focus { border-color:#7f77dd; box-shadow:0 0 0 3px rgba(127,119,221,0.15); }
-input[type="text"]:disabled { background:var(--bg); color:var(--muted); cursor:not-allowed; }
+/* over */
+.over-wrap{text-align:center}
+.trophy{font-size:2.8rem;display:block;margin-bottom:.65rem}
+.over-wrap h2{font-size:1.4rem;font-weight:700;margin-bottom:.35rem}
+.over-sub{color:var(--muted);font-size:.88rem;margin-bottom:1.4rem;line-height:1.6}
+.final-list{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.4rem;text-align:left}
+.final-row{display:flex;align-items:center;gap:.6rem;padding:.45rem .75rem;border-radius:9px;font-size:.88rem}
+.final-row .rank{font-size:.85rem;font-weight:700;color:var(--muted);min-width:1.6rem}
+.final-row.winner-row{background:var(--pb)}
+.btn-group{display:flex;flex-direction:column;gap:.5rem}
 
-.btn { display:inline-flex; align-items:center; justify-content:center; padding:0.65rem 1.25rem; font-size:0.95rem; font-weight:500; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; transition:background 0.12s,transform 0.08s; font-family:inherit; width:100%; }
-.btn:hover { background:#eceae4; }
-.btn:active { transform:scale(0.98); }
-.btn:disabled { opacity:0.38; cursor:not-allowed; transform:none; }
-.btn-primary { background:#7f77dd; color:#fff; border-color:#7f77dd; }
-.btn-primary:hover { background:#6a62cc; border-color:#6a62cc; }
-.btn-sm { width:auto; padding:0.5rem 0.9rem; font-size:0.86rem; }
-.btn-ghost { font-size:0.82rem; color:var(--danger); border-color:#f5c4c4; background:var(--danger-bg); }
-.btn-ghost:hover { background:#fce0e0; }
-
-hr { border:none; border-top:1px solid var(--border); margin:1.25rem 0; }
-
-/* Lobby */
-.name-row { display:flex; gap:0.6rem; margin-bottom:1rem; }
-.name-row input { flex:1; }
-
-.invite-box { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; margin-bottom:1.25rem; }
-.invite-box .inv-label { font-size:0.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.5rem; }
-.invite-box .inv-desc { font-size:0.84rem; color:#555; margin-bottom:0.7rem; line-height:1.6; }
-.link-row { display:flex; align-items:center; gap:0.5rem; }
-.link-row span { flex:1; font-size:0.75rem; font-family:"Courier New",monospace; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:0.35rem 0.6rem; }
-.link-copy { flex-shrink:0; font-size:0.8rem; padding:0.38rem 0.85rem; border-radius:7px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-family:inherit; color:var(--text); font-weight:500; transition:background 0.12s; }
-.link-copy:hover { background:#e5e3dc; }
-
-.player-list { display:flex; flex-direction:column; gap:0.45rem; margin-bottom:1rem; }
-.player-row { display:flex; align-items:center; gap:0.65rem; padding:0.55rem 0.8rem; border-radius:10px; font-size:0.9rem; }
-.player-row .p-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; background:var(--pc); }
-.player-row .p-name { flex:1; font-weight:500; }
-.player-row .p-badge { font-size:0.72rem; font-weight:600; color:var(--pt); background:var(--pb); border:1px solid var(--pbd); border-radius:20px; padding:0.15rem 0.55rem; }
-.player-row.empty { background:var(--bg); color:var(--faint); font-style:italic; font-size:0.85rem; }
-.player-row.filled { background:var(--pb); color:var(--pt); }
-
-.slots-note { font-size:0.8rem; color:var(--muted); text-align:center; margin-bottom:0.75rem; }
-
-.waiting-row { display:flex; align-items:center; gap:0.6rem; font-size:0.84rem; color:var(--muted); margin-top:0.75rem; }
-.pulse { width:8px; height:8px; border-radius:50%; background:#1d9e75; animation:pulse 1.4s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
-
-/* Sync status */
-.sync-bar { display:flex; align-items:center; gap:0.5rem; font-size:0.75rem; color:var(--muted); margin-bottom:1rem; }
-.sync-dot { width:7px; height:7px; border-radius:50%; background:var(--faint); flex-shrink:0; transition:background 0.3s; }
-.sync-dot.connected { background:#1d9e75; }
-.sync-dot.syncing { background:#ba7517; animation:pulse 0.8s ease-in-out infinite; }
-
-/* Scoreboard */
-.scoreboard { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1.25rem; }
-.score-row { display:flex; align-items:center; gap:0.6rem; padding:0.45rem 0.75rem; border-radius:9px; font-size:0.88rem; }
-.score-row .s-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; background:var(--pc); }
-.score-row .s-name { flex:1; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.score-row .s-words { font-weight:700; font-size:1rem; color:var(--pt); }
-.score-row.active-turn { background:var(--pb); border:1px solid var(--pbd); }
-.score-row.eliminated { opacity:0.4; text-decoration:line-through; }
-
-/* Turn banner */
-.turn-banner { display:flex; align-items:center; gap:0.6rem; padding:0.65rem 1rem; border-radius:10px; margin-bottom:1.25rem; font-size:0.92rem; font-weight:600; background:var(--pb); border:1px solid var(--pbd); color:var(--pt); }
-.turn-dot { width:9px; height:9px; border-radius:50%; background:var(--pc); }
-
-/* Chain */
-.chain-label { font-size:0.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.5rem; }
-.chain-wrap { min-height:58px; background:var(--bg); border-radius:10px; padding:0.65rem 0.85rem; margin-bottom:1rem; display:flex; flex-wrap:wrap; align-items:center; gap:0.3rem; }
-.chain-empty { font-size:0.85rem; color:var(--faint); }
-.chip { font-size:0.82rem; font-weight:500; padding:0.18rem 0.55rem; border-radius:20px; border:1px solid var(--pbd); background:var(--pb); color:var(--pt); }
-.arr { font-size:0.68rem; color:var(--faint); }
-
-.req-letter { text-align:center; font-size:0.88rem; color:var(--muted); margin-bottom:1rem; }
-.letter-badge { display:inline-block; font-size:1.35rem; font-weight:700; background:#eeedfe; color:#3c3489; border:1.5px solid #b0a9ee; border-radius:9px; padding:0.1rem 0.7rem; margin-left:0.4rem; line-height:1.5; }
-
-.input-row { display:flex; gap:0.5rem; margin-bottom:0.45rem; }
-.error { font-size:0.83rem; color:var(--danger); min-height:1.2rem; text-align:center; margin-bottom:0.5rem; }
-.checking { display:flex; align-items:center; justify-content:center; gap:0.5rem; font-size:0.83rem; color:var(--muted); min-height:1.2rem; margin-bottom:0.5rem; }
-.spinner { width:14px; height:14px; border:2px solid var(--border); border-top-color:#7f77dd; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
-@keyframes spin { to { transform:rotate(360deg); } }
-
-.action-row { display:flex; gap:0.5rem; margin-bottom:0.25rem; }
-.action-row .btn { font-size:0.85rem; }
-
-/* Over */
-.over-wrap { text-align:center; }
-.trophy { font-size:2.8rem; display:block; margin-bottom:0.65rem; }
-.over-wrap h2 { font-size:1.4rem; font-weight:700; margin-bottom:0.35rem; }
-.over-sub { color:var(--muted); font-size:0.88rem; margin-bottom:1.4rem; line-height:1.6; }
-.final-list { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1.4rem; text-align:left; }
-.final-row { display:flex; align-items:center; gap:0.6rem; padding:0.45rem 0.75rem; border-radius:9px; font-size:0.88rem; }
-.final-row .rank { font-size:0.85rem; font-weight:700; color:var(--muted); min-width:1.6rem; }
-.final-row.winner-row { background:var(--pb); }
-.btn-group { display:flex; flex-direction:column; gap:0.5rem; }
-
-/* Notification toast */
-.toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:#181816; color:#fff; font-size:0.85rem; padding:0.6rem 1.2rem; border-radius:10px; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:999; white-space:nowrap; }
-.toast.show { opacity:1; }
+/* toast */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#181816;color:#fff;font-size:.85rem;padding:.6rem 1.2rem;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
-
 <header class="site-header">
   <h1>English Shiritori</h1>
   <p>Word chain — each word starts with the last letter of the previous</p>
 </header>
-
 <div class="card" id="app"></div>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════════
-   CONSTANTS & COLOURS
-═══════════════════════════════════════════ */
-const MAX_PLAYERS = 10;
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
+const MAX = 10;
 const COLORS = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9'];
-function cc(i) { return COLORS[i % COLORS.length]; }
+const cc = i => COLORS[i % COLORS.length];
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════
    HELPERS
-═══════════════════════════════════════════ */
-function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function lastChar(w) { return w[w.length-1].toLowerCase(); }
-function uid() { return Math.random().toString(36).slice(2,10); }
+═══════════════════════════════════════ */
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") }
+function lastChar(w){ return w[w.length-1].toLowerCase() }
+function uid(){ return Math.random().toString(36).slice(2,10) }
+function toast(msg, ms=2500){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),ms) }
 
-function showToast(msg, duration=2500) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), duration);
+/* ═══════════════════════════════════════
+   URL / ROOM
+═══════════════════════════════════════ */
+function getRoomParam(){ return new URLSearchParams(location.search).get("room") }
+function getJoinUrl(hostPeerId){ 
+  return `${location.origin}${location.pathname}?room=${hostPeerId}` 
 }
 
-/* ═══════════════════════════════════════════
-   ROOM ID
-   Extracted from URL hash or query param
-═══════════════════════════════════════════ */
-function getRoomId() {
-  const params = new URLSearchParams(location.search);
-  if (params.get("room")) return params.get("room");
-  // also support hash-based room for backwards compat
-  const h = location.hash.slice(1);
-  if (h && h.length < 20 && /^[a-z0-9]+$/.test(h)) return h;
-  return null;
-}
+/* ═══════════════════════════════════════
+   IDENTITY
+═══════════════════════════════════════ */
+const myClientId = sessionStorage.getItem("s_cid") || uid();
+sessionStorage.setItem("s_cid", myClientId);
 
-function makeJoinUrl(roomId) {
-  const base = location.origin + location.pathname;
-  return `${base}?room=${roomId}`;
-}
-
-/* ═══════════════════════════════════════════
-   GUN SETUP
-═══════════════════════════════════════════ */
-const gun = Gun({
-  peers: ['https://gun-manhattan.herokuapp.com/gun'],
-  localStorage: false
-});
-
-let roomId = getRoomId();
-let isNewRoom = !roomId;
-if (isNewRoom) roomId = uid();
-
-// My persistent identity for this session
-let myId = sessionStorage.getItem("shiritori_myId") || uid();
-sessionStorage.setItem("shiritori_myId", myId);
-let mySlot = -1; // assigned when joining
-
-// Shared game node
-const roomNode = gun.get("shiritori-v3").get(roomId);
-
-/* ═══════════════════════════════════════════
-   LOCAL STATE (derived from Gun)
-═══════════════════════════════════════════ */
-let S = {
-  phase: "lobby",
-  players: [],      // [{id, name, slot}]
+/* ═══════════════════════════════════════
+   GAME STATE  (authoritative on host)
+   Synced to all peers after every change
+═══════════════════════════════════════ */
+let G = {
+  phase: "lobby",     // lobby | game | over
+  players: [],        // [{cid, name, slot}]
   turn: 0,
-  chain: [],        // [{word, slot}]
+  chain: [],          // [{word, slot}]
   used: [],
-  passes: {},       // {slot: count}
-  eliminated: [],   // [slot] in order of elimination
+  passes: {},         // {slot: n}
+  eliminated: [],     // [slot] oldest first
   winner: null,
   loseReason: null
 };
 
-let connected = false;
-let syncing = false;
+/* ═══════════════════════════════════════
+   PEER NETWORK
+   Host: has a PeerJS ID == roomId, accepts connections
+   Guests: connect to host's PeerJS ID
+═══════════════════════════════════════ */
+let peer = null;          // our PeerJS instance
+let hostConn = null;      // guest→host connection
+let guestConns = [];      // host's connections to guests
+let amHost = false;
+let mySlot = -1;          // colour slot (0 = host)
+let statusMsg = "Connecting…";
+let statusClass = "warn";
 
-/* ═══════════════════════════════════════════
-   GUN SYNC
-═══════════════════════════════════════════ */
-// We store the whole state as a single JSON string to avoid Gun's
-// partial-update complexity with arrays.
-let lastSeenData = null;
-let renderScheduled = false;
-
-function scheduleRender() {
-  if (renderScheduled) return;
-  renderScheduled = true;
-  setTimeout(() => { renderScheduled = false; render(); }, 30);
+function setStatus(msg, cls){
+  statusMsg = msg; statusClass = cls;
+  const dot = document.getElementById("sdot");
+  const lbl = document.getElementById("slbl");
+  if(dot){ dot.className = "status-dot " + cls; }
+  if(lbl){ lbl.textContent = msg; }
 }
 
-roomNode.get("state").on(data => {
-  if (!data) return;
-  if (data === lastSeenData) return;
-  lastSeenData = data;
-  connected = true;
-  syncing = false;
-  try {
-    const incoming = JSON.parse(data);
-    // Preserve mySlot across syncs
-    const prevMySlot = mySlot;
-    S = incoming;
-    // Re-resolve mySlot: find the player whose id matches mine
-    const me = S.players.find(p => p.id === myId);
-    mySlot = me ? me.slot : prevMySlot;
-    scheduleRender();
-  } catch(e) { console.warn("Parse error", e); }
-});
-
-function pushState() {
-  syncing = true;
-  updateSyncBar();
-  lastSeenData = JSON.stringify(S);
-  roomNode.get("state").put(lastSeenData);
+/* Broadcast state to all guests (host only) */
+function broadcast(obj){
+  const msg = JSON.stringify(obj);
+  guestConns.forEach(c => { try{ c.send(msg) } catch(e){} });
 }
 
-function updateSyncBar() {
-  const dot = document.getElementById("sync-dot");
-  const label = document.getElementById("sync-label");
-  if (!dot || !label) return;
-  if (syncing) {
-    dot.className = "sync-dot syncing";
-    label.textContent = "Syncing…";
-  } else if (connected) {
-    dot.className = "sync-dot connected";
-    label.textContent = "Live";
+/* Send to host (guest only) */
+function sendToHost(obj){
+  if(hostConn && hostConn.open) hostConn.send(JSON.stringify(obj));
+}
+
+/* Host pushes full state to everyone */
+function pushState(){
+  broadcast({ type:"state", G });
+  render();
+}
+
+/* Handle incoming message */
+function handleMsg(raw, fromConn){
+  let msg;
+  try { msg = JSON.parse(raw) } catch{ return }
+
+  if(amHost){
+    // Messages from guests → process and re-broadcast
+    if(msg.type === "join"){
+      const alreadyIn = G.players.find(p => p.cid === msg.cid);
+      if(alreadyIn || G.players.length >= MAX) return;
+      const slot = G.players.length;
+      G.players.push({ cid: msg.cid, name: msg.name, slot });
+      pushState();
+    } else if(msg.type === "action"){
+      applyAction(msg.action);
+    }
   } else {
-    dot.className = "sync-dot";
-    label.textContent = "Connecting…";
+    // Message from host
+    if(msg.type === "state"){
+      G = msg.G;
+      // re-resolve my slot
+      const me = G.players.find(p => p.cid === myClientId);
+      if(me) mySlot = me.slot;
+      render();
+    } else if(msg.type === "kicked"){
+      document.getElementById("app").innerHTML = `<div style="text-align:center;padding:2rem 0"><div style="font-size:2rem;margin-bottom:.75rem">👋</div><div style="font-weight:600">Game has ended</div><div style="color:var(--muted);font-size:.88rem;margin-top:.5rem">The host ended the game.</div><div style="margin-top:1.5rem"><a href="${location.origin+location.pathname}" style="color:#7f77dd;text-decoration:none;font-weight:500">← Start a new game</a></div></div>`;
+    }
   }
 }
 
-// Heartbeat to show connected status
-setInterval(() => {
-  if (!connected) return;
-  updateSyncBar();
-}, 2000);
+/* Apply an action authoritatively (host only) */
+function applyAction(action){
+  if(!amHost) return;
+  if(action.type === "start"){
+    if(G.players.length < 2) return;
+    G.phase = "game"; G.turn = 0; G.chain = []; G.used = [];
+    G.passes = {}; G.eliminated = []; G.winner = null; G.loseReason = null;
+  } else if(action.type === "word"){
+    const slot = action.slot;
+    const word = action.word;
+    const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
+    if(req && word[0] !== req){ doEliminate(slot, "invalid"); return; }
+    if(G.used.includes(word)){ doEliminate(slot, "repeated"); return; }
+    if(!action.valid){ doEliminate(slot, "notaword"); return; }
+    G.chain.push({ word, slot });
+    G.used.push(word);
+    const ap = getActive();
+    G.turn = (G.turn + 1) % ap.length;
+  } else if(action.type === "pass"){
+    const slot = action.slot;
+    G.passes[slot] = (G.passes[slot]||0) + 1;
+    const ap = getActive();
+    G.turn = (G.turn + 1) % ap.length;
+  } else if(action.type === "end"){
+    G.phase = "lobby"; G.chain = []; G.used = [];
+    G.passes = {}; G.eliminated = []; G.winner = null; G.loseReason = null; G.turn = 0;
+  } else if(action.type === "again"){
+    G.phase = "game"; G.turn = 0; G.chain = []; G.used = [];
+    G.passes = {}; G.eliminated = []; G.winner = null; G.loseReason = null;
+  }
+  pushState();
+}
 
-/* ═══════════════════════════════════════════
+function doEliminate(slot, reason){
+  if(G.eliminated.includes(slot)) return;
+  G.eliminated.push(slot);
+  G.loseReason = reason;
+  const rem = getActive();
+  if(rem.length === 1){
+    G.phase = "over";
+    G.winner = rem[0].slot;
+  } else {
+    G.turn = G.turn % rem.length;
+  }
+}
+
+function dispatchAction(action){
+  if(amHost){ applyAction(action); }
+  else { sendToHost({ type:"action", action }); }
+}
+
+/* ═══════════════════════════════════════
+   PEERJS INIT
+═══════════════════════════════════════ */
+function initPeer(id){
+  // Try multiple PeerJS cloud servers for resilience
+  const configs = [
+    { host: '0.peerjs.com', path: '/', secure: true },
+    { host: 'peerjs.92k.de', path: '/', secure: true }
+  ];
+  let cfgIdx = 0;
+
+  function tryConnect(){
+    const cfg = configs[cfgIdx % configs.length];
+    peer = new Peer(id, { ...cfg, debug: 0 });
+
+    peer.on("open", peerId => {
+      setStatus("Connected", "ok");
+      if(amHost){
+        // Host: now listen for guests
+        peer.on("connection", conn => {
+          conn.on("open", () => {
+            guestConns.push(conn);
+            // Send current state immediately
+            conn.send(JSON.stringify({ type:"state", G }));
+            setStatus(`${guestConns.length} peer${guestConns.length>1?"s":""} connected`, "ok");
+          });
+          conn.on("data", raw => handleMsg(raw, conn));
+          conn.on("close", () => {
+            guestConns = guestConns.filter(c => c !== conn);
+            setStatus(`${guestConns.length} peer${guestConns.length!==1?"s":""} connected`, guestConns.length?"ok":"warn");
+          });
+          conn.on("error", () => {
+            guestConns = guestConns.filter(c => c !== conn);
+          });
+        });
+        render();
+      }
+    });
+
+    peer.on("error", err => {
+      if(err.type === "unavailable-id"){
+        // ID taken — generate new one (shouldn't happen but safe)
+        peer.destroy();
+        setTimeout(()=>{ initPeer(uid()) }, 500);
+        return;
+      }
+      setStatus("Connection error — retrying…", "err");
+      peer.destroy();
+      cfgIdx++;
+      setTimeout(tryConnect, 2000);
+    });
+
+    peer.on("disconnected", () => {
+      setStatus("Reconnecting…", "warn");
+      peer.reconnect();
+    });
+  }
+  tryConnect();
+}
+
+function connectToHost(hostId){
+  const conn = peer.connect(hostId, { reliable: true, serialization: "raw" });
+  hostConn = conn;
+  conn.on("open", () => {
+    setStatus("Connected to host", "ok");
+    // Send join request
+    conn.send(JSON.stringify({ type:"join", cid: myClientId, name: myName }));
+  });
+  conn.on("data", raw => handleMsg(raw, conn));
+  conn.on("close", () => {
+    setStatus("Host disconnected", "err");
+    setTimeout(()=>{
+      document.getElementById("app").innerHTML = `<div style="text-align:center;padding:2rem 0"><div style="font-size:2rem;margin-bottom:.75rem">🔌</div><div style="font-weight:600">Lost connection to host</div><div style="color:var(--muted);font-size:.88rem;margin-top:.5rem">The host may have closed the game.</div><div style="margin-top:1.5rem"><a href="${location.origin+location.pathname}" style="color:#7f77dd;text-decoration:none;font-weight:500">← Start a new game</a></div></div>`;
+    }, 300);
+  });
+  conn.on("error", e => setStatus("Peer error: "+e, "err"));
+}
+
+/* ═══════════════════════════════════════
+   STARTUP
+═══════════════════════════════════════ */
+const roomParam = getRoomParam();
+let myName = ""; // set when user enters it
+
+if(!roomParam){
+  // I am the host
+  amHost = true;
+  mySlot = 0;
+  const hostId = "shiri-" + uid();
+  setStatus("Connecting…", "warn");
+  initPeer(hostId);
+  // Don't add self to G.players yet — wait for name entry
+} else {
+  // I am a guest — need to enter name first, then connect
+  amHost = false;
+  setStatus("Connecting to room…", "warn");
+  // Create a random peer ID for ourselves
+  const guestId = "shiri-g-" + uid();
+  initPeer(guestId);
+  // Connect to host after peer is open (handled in open event via render flow)
+}
+
+/* ═══════════════════════════════════════
+   GAME HELPERS
+═══════════════════════════════════════ */
+function getActive(){ return G.players.filter(p => !G.eliminated.includes(p.slot)) }
+function getCurrentTurn(){ const a=getActive(); return a.length ? a[G.turn % a.length] : null }
+function isMyTurn(){ const ct=getCurrentTurn(); return ct && ct.cid===myClientId }
+
+/* ═══════════════════════════════════════
    RENDER
-═══════════════════════════════════════════ */
-function render() {
+═══════════════════════════════════════ */
+function render(){
   const el = document.getElementById("app");
-  if (S.phase === "lobby") el.innerHTML = lobbyHTML();
-  else if (S.phase === "game") el.innerHTML = gameHTML();
+  const inGame = G.phase === "game" || G.phase === "over";
+  const me = G.players.find(p => p.cid === myClientId);
+
+  // Guest hasn't entered name yet
+  if(!amHost && !me && G.phase === "lobby"){
+    el.innerHTML = guestJoinHTML();
+    bindGuestJoin();
+    return;
+  }
+  // Host hasn't entered name yet
+  if(amHost && !me && G.phase === "lobby"){
+    el.innerHTML = hostJoinHTML();
+    bindHostJoin();
+    return;
+  }
+
+  if(G.phase === "lobby") el.innerHTML = lobbyHTML();
+  else if(G.phase === "game") el.innerHTML = gameHTML();
   else el.innerHTML = overHTML();
-  updateSyncBar();
   bind();
 }
 
-/* ─── LOBBY ─── */
-function lobbyHTML() {
-  const me = S.players.find(p => p.id === myId);
-  const isMember = !!me;
-  const isHost = S.players.length > 0 && S.players[0].id === myId;
-  const canStart = isHost && S.players.length >= 2;
-  const lobbyFull = S.players.length >= MAX_PLAYERS;
-  const shareUrl = makeJoinUrl(roomId);
+/* ─── HOST NAME ENTRY ─── */
+function hostJoinHTML(){
+  return `
+    <div class="status-bar"><div class="status-dot ${statusClass}" id="sdot"></div><span id="slbl">${esc(statusMsg)}</span></div>
+    <div class="eyebrow">New Game — Your Name</div>
+    <div class="rules">
+      <b>How to play:</b> Players chain words where each word starts with the <b>last letter</b>
+      of the previous. Words are dictionary-checked. Wrong letter, repeat, or fake word
+      = eliminated. Last one standing wins. Each player gets <b>1 pass</b>.
+    </div>
+    <div class="name-row">
+      <input type="text" id="host-name" placeholder="Your name (you are the host)" maxlength="20" autofocus>
+      <button class="btn btn-primary btn-sm" id="host-join-btn">Continue</button>
+    </div>`;
+}
 
-  const playerRows = S.players.map((p, i) => `
+function bindHostJoin(){
+  const go = () => {
+    const n = document.getElementById("host-name").value.trim();
+    if(!n) return;
+    myName = n;
+    mySlot = 0;
+    G.players.push({ cid: myClientId, name: n, slot: 0 });
+    render();
+  };
+  document.getElementById("host-join-btn").onclick = go;
+  document.getElementById("host-name").onkeydown = e => { if(e.key==="Enter") go() };
+}
+
+/* ─── GUEST NAME ENTRY ─── */
+function guestJoinHTML(){
+  return `
+    <div class="status-bar"><div class="status-dot ${statusClass}" id="sdot"></div><span id="slbl">${esc(statusMsg)}</span></div>
+    <div class="eyebrow">Join Game</div>
+    <div class="name-row">
+      <input type="text" id="guest-name" placeholder="Enter your name to join" maxlength="20" autofocus>
+      <button class="btn btn-primary btn-sm" id="guest-join-btn">Join</button>
+    </div>`;
+}
+
+function bindGuestJoin(){
+  const go = () => {
+    const n = document.getElementById("guest-name").value.trim();
+    if(!n){ document.getElementById("guest-name").focus(); return; }
+    myName = n;
+    // Connect to host now
+    if(peer && peer.open){
+      connectToHost(roomParam);
+    } else {
+      // Wait for peer to open
+      const chk = setInterval(()=>{
+        if(peer && peer.open){ clearInterval(chk); connectToHost(roomParam); }
+      }, 200);
+    }
+    setStatus("Joining room…","warn");
+    document.getElementById("guest-join-btn").disabled = true;
+    document.getElementById("guest-name").disabled = true;
+  };
+  document.getElementById("guest-join-btn").onclick = go;
+  document.getElementById("guest-name").onkeydown = e => { if(e.key==="Enter") go() };
+}
+
+/* ─── LOBBY ─── */
+function lobbyHTML(){
+  const isHost = amHost;
+  const canStart = isHost && G.players.length >= 2;
+  const hostPeerId = peer ? peer.id : "";
+  const shareUrl = hostPeerId ? getJoinUrl(hostPeerId) : "Connecting…";
+
+  const playerRows = G.players.map((p,i) => `
     <div class="player-row filled ${cc(p.slot)}">
       <div class="p-dot"></div>
-      <div class="p-name">${esc(p.name)}${p.id === myId ? " <span style='font-size:0.75rem;opacity:0.6'>(you)</span>" : ""}</div>
-      <div class="p-badge">${i === 0 ? "Host" : "Player " + (i+1)}</div>
+      <div class="p-name">${esc(p.name)}${p.cid===myClientId?' <span style="font-size:.75rem;opacity:.6">(you)</span>':""}</div>
+      <div class="p-badge">${i===0?"Host":"Player "+(i+1)}</div>
     </div>`).join("");
 
-  const emptyCount = Math.max(0, 2 - S.players.length);
-  const emptyRows = Array.from({length: emptyCount}, (_, i) =>
-    `<div class="player-row empty">Waiting for player ${S.players.length + i + 1}…</div>`
+  const emptyCount = Math.max(0, 2 - G.players.length);
+  const emptyRows = Array.from({length:emptyCount},(_,i)=>
+    `<div class="player-row empty">Waiting for player ${G.players.length+i+1}…</div>`
   ).join("");
 
-  const joinSection = !isMember && !lobbyFull ? `
-    <div class="name-row">
-      <input type="text" id="join-name" placeholder="Enter your name to join" maxlength="20" autofocus>
-      <button class="btn btn-primary btn-sm" id="join-btn">Join</button>
-    </div>` : "";
-
-  const hostSection = isHost ? `
-    <button class="btn btn-primary" id="start-btn" ${canStart ? "" : "disabled"}>
-      ${canStart ? "Start game →" : "Need at least 2 players to start"}
-    </button>` : isMember ? `
-    <div class="waiting-row"><div class="pulse"></div> Waiting for the host to start…</div>` : "";
+  const hostControls = isHost ? `
+    <button class="btn btn-primary" id="start-btn" ${canStart?"":"disabled"}>
+      ${canStart ? "Start game →" : "Need at least 2 players"}
+    </button>` : `
+    <div class="waiting-row"><div class="pulse"></div>Waiting for host to start…</div>`;
 
   return `
-    <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Connecting…</span></div>
-    <div class="eyebrow">Game Lobby · Room ${roomId}</div>
-    <div class="rules">
-      <b>How to play:</b> Players take turns saying words in a chain — each word must start
-      with the <b>last letter</b> of the previous word, and be a real dictionary word.
-      Wrong letter, repeated word, or non-word = <b>eliminated</b>. Last player standing wins.
-      Each player gets <b>1 pass</b>.
-    </div>
-
+    <div class="status-bar"><div class="status-dot ${statusClass}" id="sdot"></div><span id="slbl">${esc(statusMsg)}</span></div>
+    <div class="eyebrow">Game Lobby</div>
+    <div class="rules"><b>How to play:</b> Each word must start with the <b>last letter</b> of the previous.
+    Words are dictionary-checked. Wrong letter, repeat, or non-word = <b>eliminated</b>.
+    Last player standing wins. Each player gets <b>1 pass</b>.</div>
     <div class="player-list">${playerRows}${emptyRows}</div>
-    <div class="slots-note">${S.players.length} / ${MAX_PLAYERS} players joined</div>
-
-    ${joinSection}
-
+    <div class="slots-note">${G.players.length} / ${MAX} players · ${MAX-G.players.length} slots open</div>
     <div class="invite-box">
       <div class="inv-label">Invite players</div>
-      <div class="inv-desc">Share this link — anyone who opens it joins this room live (up to ${MAX_PLAYERS}).</div>
+      <div class="inv-desc">Share this link — anyone who opens it joins your room live.</div>
       <div class="link-row">
         <span id="share-url">${esc(shareUrl)}</span>
         <button class="link-copy" id="copy-btn">Copy</button>
       </div>
-      ${!lobbyFull
-        ? `<div class="waiting-row"><div class="pulse"></div> ${MAX_PLAYERS - S.players.length} slot${MAX_PLAYERS - S.players.length !== 1 ? "s" : ""} open</div>`
-        : `<div class="waiting-row" style="color:#639922">Lobby full!</div>`}
+      <div class="waiting-row"><div class="pulse"></div>${MAX-G.players.length} slot${MAX-G.players.length!==1?"s":""} open</div>
     </div>
-
-    ${hostSection}`;
+    ${hostControls}`;
 }
 
 /* ─── GAME ─── */
-function gameHTML() {
-  const active = S.players.filter(p => !S.eliminated.includes(p.slot));
-  const ct = active[S.turn % active.length];
-  const myTurn = ct && ct.id === myId;
-  const req = S.chain.length ? lastChar(S.chain[S.chain.length-1].word) : null;
+function gameHTML(){
+  const ct = getCurrentTurn();
+  const myTurn = isMyTurn();
+  const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
 
-  const scoreRows = S.players.map(p => {
-    const isActive = ct && p.slot === ct.slot;
-    const isElim = S.eliminated.includes(p.slot);
-    const words = S.chain.filter(e => e.slot === p.slot).length;
+  const scoreRows = G.players.map(p => {
+    const isActive = ct && p.slot===ct.slot;
+    const isElim = G.eliminated.includes(p.slot);
+    const words = G.chain.filter(e=>e.slot===p.slot).length;
     return `<div class="score-row ${cc(p.slot)} ${isActive?"active-turn":""} ${isElim?"eliminated":""}">
       <div class="s-dot"></div>
-      <div class="s-name">${esc(p.name)}${p.id===myId?" <span style='font-size:0.72rem;opacity:0.5'>(you)</span>":""}</div>
+      <div class="s-name">${esc(p.name)}${p.cid===myClientId?' <span style="font-size:.72rem;opacity:.5">(you)</span>':""}</div>
       <div class="s-words">${words}</div>
     </div>`;
   }).join("");
 
-  const chainBody = !S.chain.length
+  const chainBody = !G.chain.length
     ? `<span class="chain-empty">Any word to begin…</span>`
-    : S.chain.map((e,i) => {
-        const player = S.players.find(p => p.slot === e.slot);
-        return (i ? `<span class="arr">›</span>` : "") +
-          `<span class="chip ${cc(e.slot)}" title="${player ? esc(player.name) : ""}">${esc(e.word)}</span>`;
+    : G.chain.map((e,i)=>{
+        const pl = G.players.find(p=>p.slot===e.slot);
+        return (i?`<span class="arr">›</span>`:"") +
+          `<span class="chip ${cc(e.slot)}" title="${pl?esc(pl.name):""}">${esc(e.word)}</span>`;
       }).join("");
 
   const reqHTML = req
     ? `<div class="req-letter">Must start with <span class="letter-badge">${req.toUpperCase()}</span></div>`
     : `<div class="req-letter" style="color:var(--faint)">Any word to begin</div>`;
 
-  const canPass = ct && (S.passes[ct.slot] || 0) < 1;
+  const canPass = ct && (G.passes[ct.slot]||0) < 1;
 
   const inputSection = myTurn ? `
     <div class="input-row">
@@ -409,249 +578,160 @@ function gameHTML() {
         : `<button class="btn btn-sm" disabled>No passes left</button>`}
       <button class="btn btn-sm btn-ghost" id="end-btn">End game</button>
     </div>` : `
-    <div style="text-align:center;font-size:0.88rem;color:var(--muted);margin-bottom:0.75rem">
-      ⏳ Waiting for <b>${ct ? esc(ct.name) : "next player"}</b> to play…
+    <div style="text-align:center;font-size:.88rem;color:var(--muted);margin-bottom:.75rem">
+      ⏳ Waiting for <b>${ct?esc(ct.name):"…"}</b> to play…
     </div>
     <div class="action-row" style="justify-content:center">
       <button class="btn btn-sm btn-ghost" id="end-btn">End game</button>
     </div>`;
 
   return `
-    <div class="sync-bar"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Connecting…</span></div>
+    <div class="status-bar"><div class="status-dot ${statusClass}" id="sdot"></div><span id="slbl">${esc(statusMsg)}</span></div>
     <div class="scoreboard">${scoreRows}</div>
-    <div class="turn-banner ${ct ? cc(ct.slot) : ""}">
-      <div class="turn-dot"></div>
-      ${ct ? esc(ct.name) + (myTurn ? " — your turn!" : "'s turn") : ""}
-    </div>
-    <div class="chain-label">Word chain — ${S.chain.length} word${S.chain.length!==1?"s":""}</div>
+    <div class="turn-banner ${ct?cc(ct.slot):""}"><div class="turn-dot"></div>${ct?esc(ct.name)+(myTurn?" — your turn!":"'s turn"):""}</div>
+    <div class="chain-label">Word chain — ${G.chain.length} word${G.chain.length!==1?"s":""}</div>
     <div class="chain-wrap">${chainBody}</div>
-    ${reqHTML}
-    ${inputSection}`;
+    ${reqHTML}${inputSection}`;
 }
 
 /* ─── OVER ─── */
-function overHTML() {
-  const loserOrder = [...S.eliminated].reverse();
-  const ranking = S.winner !== null ? [S.winner, ...loserOrder] : loserOrder;
-  const winnerPlayer = S.players.find(p => p.slot === S.winner);
-  const firstLoser = S.eliminated.length ? S.players.find(p => p.slot === S.eliminated[0]) : null;
-  const whyMap = { invalid:"wrong starting letter", repeated:"repeated a word", notaword:"not a real word", passed:"no passes left" };
+function overHTML(){
+  const loserOrder = [...G.eliminated].reverse();
+  const ranking = G.winner!==null ? [G.winner,...loserOrder] : loserOrder;
+  const wp = G.players.find(p=>p.slot===G.winner);
+  const fp = G.eliminated.length ? G.players.find(p=>p.slot===G.eliminated[0]) : null;
+  const whyMap = {invalid:"wrong starting letter",repeated:"repeated a word",notaword:"not a real word",passed:"no passes left"};
 
-  const rows = ranking.map((slot, i) => {
-    const p = S.players.find(p => p.slot === slot);
-    if (!p) return "";
+  const rows = ranking.map((slot,i)=>{
+    const p = G.players.find(p=>p.slot===slot);
+    if(!p) return "";
     const medal = ["🥇","🥈","🥉"][i] || `${i+1}.`;
-    const words = S.chain.filter(e => e.slot === slot).length;
+    const words = G.chain.filter(e=>e.slot===slot).length;
     return `<div class="final-row ${i===0?"winner-row":""} ${cc(slot)}">
       <span class="rank">${medal}</span>
       <div style="width:9px;height:9px;border-radius:50%;background:var(--pc);flex-shrink:0"></div>
       <div style="flex:1;font-weight:500">${esc(p.name)}</div>
-      <div style="font-size:0.82rem;color:var(--muted)">${words} word${words!==1?"s":""}</div>
+      <div style="font-size:.82rem;color:var(--muted)">${words} word${words!==1?"s":""}</div>
     </div>`;
   }).join("");
 
   return `
     <div class="over-wrap">
       <span class="trophy">🏆</span>
-      <h2>${winnerPlayer ? esc(winnerPlayer.name) : "Game over"}!</h2>
-      <p class="over-sub">
-        ${firstLoser ? `${esc(firstLoser.name)} was eliminated first (${whyMap[S.loseReason]||"error"}).` : ""}
-        <br>${S.players.length} players · ${S.chain.length} words
-      </p>
+      <h2>${wp?esc(wp.name):"Game over"}!</h2>
+      <p class="over-sub">${fp?esc(fp.name)+" eliminated first ("+( whyMap[G.loseReason]||"error")+").":""}<br>${G.players.length} players · ${G.chain.length} words</p>
       <div class="final-list">${rows}</div>
       <div class="btn-group">
-        <button class="btn btn-primary" id="again-btn">Play again (same players)</button>
+        ${amHost?`<button class="btn btn-primary" id="again-btn">Play again (same players)</button>`:""}
         <button class="btn" id="newgame-btn">New game</button>
       </div>
     </div>`;
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════
    DICTIONARY
-═══════════════════════════════════════════ */
+═══════════════════════════════════════ */
 const wordCache = {};
-async function isRealWord(word) {
-  if (word in wordCache) return wordCache[word];
-  try {
+async function isRealWord(word){
+  if(word in wordCache) return wordCache[word];
+  try{
     const r = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
     return (wordCache[word] = r.ok);
-  } catch { return (wordCache[word] = true); }
+  } catch{ return (wordCache[word] = true) }
 }
 
-function setChecking(on, word) {
-  const err = document.getElementById("err");
-  const btn = document.getElementById("play-btn");
-  const wi  = document.getElementById("word-input");
-  if (!err) return;
-  if (on) {
-    err.innerHTML = `<div class="checking"><div class="spinner"></div> Checking "${esc(word)}"…</div>`;
-    if (btn) btn.disabled = true;
-    if (wi)  wi.disabled = true;
+function setChecking(on, word){
+  const err=document.getElementById("err");
+  const btn=document.getElementById("play-btn");
+  const wi=document.getElementById("word-input");
+  if(!err) return;
+  if(on){
+    err.innerHTML=`<div class="checking"><div class="spinner"></div>Checking "${esc(word)}"…</div>`;
+    if(btn) btn.disabled=true;
+    if(wi) wi.disabled=true;
   } else {
-    err.innerHTML = "";
-    if (btn) btn.disabled = false;
-    if (wi)  { wi.disabled = false; wi.focus(); }
+    err.innerHTML="";
+    if(btn) btn.disabled=false;
+    if(wi){ wi.disabled=false; wi.focus() }
   }
 }
 
-/* ═══════════════════════════════════════════
-   GAME LOGIC
-═══════════════════════════════════════════ */
-function getActive() { return S.players.filter(p => !S.eliminated.includes(p.slot)); }
-function getCurrentTurn() { const a = getActive(); return a[S.turn % a.length]; }
-
-function eliminate(slot, reason) {
-  if (S.eliminated.includes(slot)) return;
-  S.eliminated.push(slot);
-  S.loseReason = reason;
-  const remaining = getActive();
-  if (remaining.length === 1) {
-    S.phase = "over";
-    S.winner = remaining[0].slot;
-  } else {
-    S.turn = S.turn % remaining.length;
-  }
-  pushState();
-  render();
-}
-
-async function submitWord(raw) {
-  const word = raw.trim().toLowerCase().replace(/[^a-z]/g, "");
-  const err = document.getElementById("err");
-  if (!word) { if (err) err.textContent = "Please enter a word."; return; }
-
-  const ct = getCurrentTurn();
-  if (!ct || ct.id !== myId) return;
-
-  const req = S.chain.length ? lastChar(S.chain[S.chain.length-1].word) : null;
-  if (req && word[0] !== req) { eliminate(mySlot, "invalid"); return; }
-  if (S.used.includes(word))   { eliminate(mySlot, "repeated"); return; }
-
-  setChecking(true, word);
-  const valid = await isRealWord(word);
-  setChecking(false, word);
-
-  if (!valid) {
-    const e2 = document.getElementById("err");
-    if (e2) e2.textContent = `"${word}" isn't in the dictionary!`;
-    setTimeout(() => eliminate(mySlot, "notaword"), 900);
-    return;
-  }
-
-  S.chain.push({ word, slot: mySlot });
-  S.used.push(word);
-  const newActive = getActive();
-  S.turn = (S.turn + 1) % newActive.length;
-  pushState();
-  render();
-}
-
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════
    BIND
-═══════════════════════════════════════════ */
-function bind() {
+═══════════════════════════════════════ */
+function bind(){
   const g = id => document.getElementById(id);
 
-  // Copy link
-  const copyBtn = g("copy-btn");
-  if (copyBtn) copyBtn.onclick = () => {
-    const url = g("share-url") ? g("share-url").textContent : makeJoinUrl(roomId);
+  // Copy link (shown in lobby)
+  const cb = g("copy-btn");
+  if(cb) cb.onclick = ()=>{
+    const url = g("share-url").textContent;
     navigator.clipboard.writeText(url)
-      .then(() => { copyBtn.textContent="Copied!"; setTimeout(()=>{ if(g("copy-btn")) g("copy-btn").textContent="Copy"; },1800); })
-      .catch(() => prompt("Copy this link:", url));
+      .then(()=>{ cb.textContent="Copied!"; setTimeout(()=>{ if(g("copy-btn")) g("copy-btn").textContent="Copy" },1800) })
+      .catch(()=>prompt("Copy this link:",url));
   };
 
-  if (S.phase === "lobby") {
-    const joinBtn = g("join-btn");
-    if (joinBtn) {
-      const doJoin = () => {
-        const ni = g("join-name");
-        const name = ni ? ni.value.trim() : "";
-        if (!name) { if (ni) ni.focus(); return; }
-        const slot = S.players.length; // next available slot
-        mySlot = slot;
-        S.players.push({ id: myId, name, slot });
-        pushState();
-        render();
-      };
-      joinBtn.onclick = doJoin;
-      const ni = g("join-name");
-      if (ni) ni.onkeydown = e => { if (e.key==="Enter") doJoin(); };
-    }
-
-    const startBtn = g("start-btn");
-    if (startBtn) startBtn.onclick = () => {
-      if (S.players.length < 2) return;
-      S.phase = "game";
-      S.turn = 0; S.chain = []; S.used = [];
-      S.passes = {}; S.eliminated = []; S.winner = null; S.loseReason = null;
-      pushState();
-      render();
-    };
+  if(G.phase==="lobby"){
+    const sb = g("start-btn");
+    if(sb) sb.onclick = () => dispatchAction({ type:"start" });
   }
 
-  if (S.phase === "game") {
+  if(G.phase==="game"){
     const wb = g("play-btn");
     const wi = g("word-input");
-    if (wb) wb.onclick = () => submitWord(wi.value);
-    if (wi) wi.onkeydown = e => { if (e.key==="Enter") submitWord(wi.value); };
+
+    if(wb && wi) {
+      const doPlay = async () => {
+        const word = wi.value.trim().toLowerCase().replace(/[^a-z]/g,"");
+        const err = g("err");
+        if(!word){ if(err) err.textContent="Please enter a word."; return; }
+        if(!isMyTurn()) return;
+
+        const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
+        if(req && word[0]!==req){
+          dispatchAction({ type:"word", word, slot:mySlot, valid:false });
+          return;
+        }
+        if(G.used.includes(word)){
+          dispatchAction({ type:"word", word, slot:mySlot, valid:false });
+          return;
+        }
+
+        setChecking(true, word);
+        const valid = await isRealWord(word);
+        setChecking(false, word);
+
+        if(!valid){
+          const e2=g("err");
+          if(e2) e2.textContent=`"${word}" isn't in the dictionary!`;
+          setTimeout(()=>dispatchAction({ type:"word", word, slot:mySlot, valid:false }),900);
+          return;
+        }
+        dispatchAction({ type:"word", word, slot:mySlot, valid:true });
+      };
+      wb.onclick = doPlay;
+      wi.onkeydown = e => { if(e.key==="Enter") doPlay() };
+    }
 
     const pb = g("pass-btn");
-    if (pb) pb.onclick = () => {
-      const ct = getCurrentTurn();
-      if (!ct || ct.id !== myId) return;
-      S.passes[mySlot] = (S.passes[mySlot]||0) + 1;
-      const newActive = getActive();
-      S.turn = (S.turn + 1) % newActive.length;
-      pushState();
-      render();
-    };
+    if(pb) pb.onclick = () => { if(isMyTurn()) dispatchAction({ type:"pass", slot:mySlot }) };
 
     const eb = g("end-btn");
-    if (eb) eb.onclick = () => {
-      if (confirm("End the game for everyone?")) {
-        S.phase = "lobby"; S.chain = []; S.used = [];
-        S.passes = {}; S.eliminated = []; S.winner = null; S.loseReason = null; S.turn = 0;
-        pushState(); render();
-      }
-    };
+    if(eb) eb.onclick = () => { if(confirm("End the game for everyone?")) dispatchAction({ type:"end" }) };
   }
 
-  if (S.phase === "over") {
-    g("again-btn").onclick = () => {
-      S.phase="game"; S.turn=0; S.chain=[]; S.used=[];
-      S.passes={}; S.eliminated=[]; S.winner=null; S.loseReason=null;
-      pushState(); render();
-    };
-    g("newgame-btn").onclick = () => {
-      // Redirect to base URL to start fresh
-      location.href = location.origin + location.pathname;
-    };
+  if(G.phase==="over"){
+    const ab = g("again-btn");
+    if(ab) ab.onclick = () => dispatchAction({ type:"again" });
+    const nb = g("newgame-btn");
+    if(nb) nb.onclick = () => { location.href = location.origin + location.pathname };
   }
 }
 
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
-// If this is a brand new room, push empty state so Gun creates the node
-if (isNewRoom) {
-  // Small delay so Gun connects first
-  setTimeout(() => { pushState(); render(); }, 300);
-} else {
-  // Joining an existing room — just render lobby/loading while Gun syncs
-  render();
-  // If nothing comes back from Gun after 4s, show a not-found message
-  setTimeout(() => {
-    if (!connected) {
-      document.getElementById("app").innerHTML = `
-        <div style="text-align:center;padding:2rem 0">
-          <div style="font-size:2rem;margin-bottom:1rem">🔌</div>
-          <div style="font-weight:600;margin-bottom:0.5rem">Connecting to room…</div>
-          <div style="font-size:0.88rem;color:var(--muted)">If this takes too long, check your connection or ask the host to share a new link.</div>
-        </div>`;
-    }
-  }, 4000);
-}
+/* ═══════════════════════════════════════
+   INIT RENDER
+═══════════════════════════════════════ */
+render();
 </script>
 </body>
 </html>
