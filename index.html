@@ -326,8 +326,8 @@ function getActive() { return G.players.filter(p => !G.eliminated.includes(p.slo
 function getCurrentTurn() { const a = getActive(); return a.length ? a[G.turn % a.length] : null; }
 function isMyTurn() { const ct = getCurrentTurn(); return ct && ct.cid === myClientId; }
 
-// Host processes all actions — guests send raw actions, host validates + pushes state
-async function applyAction(action) {
+// Host processes all actions synchronously — no async, no fetch on host side
+function applyAction(action) {
   if (!amHost) return;
 
   if (action.type === "start") {
@@ -336,16 +336,13 @@ async function applyAction(action) {
     pushState();
 
   } else if (action.type === "word") {
-    const { word, slot } = action;
+    const { word, slot, valid } = action;
     const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
 
-    // 1. Wrong starting letter?
-    if (req && word[0] !== req) { doEliminate(slot, "invalid"); pushState(); return; }
-    // 2. Already used?
+    // Host enforces structural rules (letter, repeat) — trusts submitter's dictionary check
+    if (req && word[0] !== req) { doEliminate(slot, "invalid");  pushState(); return; }
     if (G.used.includes(word))  { doEliminate(slot, "repeated"); pushState(); return; }
-    // 3. Dictionary check — host only, single source of truth
-    const valid = await isRealWord(word);
-    if (!valid) { doEliminate(slot, "notaword"); pushState(); return; }
+    if (!valid)                 { doEliminate(slot, "notaword"); pushState(); return; }
 
     G.chain.push({ word, slot });
     G.used.push(word);
@@ -386,15 +383,20 @@ function dispatch(action) {
 }
 
 /* ═══════════════════════════
-   DICTIONARY
+   DICTIONARY  (runs on submitting player's device)
 ═══════════════════════════ */
 const wordCache = {};
 async function isRealWord(word) {
   if (word in wordCache) return wordCache[word];
   try {
-    const r = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    const r = await fetch(
+      `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`
+    );
     return (wordCache[word] = r.ok);
-  } catch { return (wordCache[word] = true); } // fail open if offline
+  } catch {
+    // Network error (offline, DNS failure, etc.) — re-throw so doPlay can handle it
+    throw new Error("network");
+  }
 }
 
 /* ═══════════════════════════
@@ -672,12 +674,37 @@ function bind() {
       const errEl = $("err");
       if (!word) { if(errEl) errEl.textContent = "Please enter a word."; return; }
 
-      // Set local flag — host will validate everything and push back state
-      // when state arrives, waitingForHost clears and render() replaces the UI
+      // Quick structural checks locally — no API needed for these
+      const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
+      if (req && word[0] !== req) {
+        waitingForHost = true; wi.value = ""; render();
+        dispatch({ type:"word", word, slot:mySlot, valid:false });
+        return;
+      }
+      if (G.used.includes(word)) {
+        waitingForHost = true; wi.value = ""; render();
+        dispatch({ type:"word", word, slot:mySlot, valid:false });
+        return;
+      }
+
+      // Dictionary check on this device
       waitingForHost = true;
       wi.value = "";
-      render(); // immediately re-render to show "checking" state locally
-      dispatch({ type:"word", word, slot:mySlot });
+      render(); // show spinner
+
+      let valid;
+      try {
+        valid = await isRealWord(word);
+      } catch {
+        // Genuine network failure — unblock UI and tell the player
+        waitingForHost = false;
+        render();
+        const e2 = $("err");
+        if (e2) e2.textContent = "⚠️ Dictionary unreachable — check your connection and try again.";
+        return;
+      }
+
+      dispatch({ type:"word", word, slot:mySlot, valid });
     };
 
     if(wb) wb.onclick = doPlay;
