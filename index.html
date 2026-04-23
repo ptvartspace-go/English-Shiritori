@@ -31,40 +31,30 @@ body{display:flex;flex-direction:column;align-items:center;padding:2.5rem 1rem 4
 .eyebrow{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
 .rules{background:var(--bg);border-radius:10px;padding:.9rem 1.1rem;font-size:.84rem;color:#555;line-height:1.75;margin-bottom:1.4rem}
 .rules b{color:var(--text);font-weight:600}
-
 input[type=text]{width:100%;padding:.6rem .9rem;font-size:1rem;border:1px solid var(--border);border-radius:9px;outline:none;background:var(--surface);color:var(--text);transition:border-color .15s,box-shadow .15s;font-family:inherit}
 input[type=text]:focus{border-color:#7f77dd;box-shadow:0 0 0 3px rgba(127,119,221,.15)}
 input[type=text]:disabled{background:var(--bg);color:var(--muted);cursor:not-allowed}
-
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:.65rem 1.25rem;font-size:.95rem;font-weight:500;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:background .12s,transform .08s;font-family:inherit;width:100%}
-.btn:hover{background:#eceae4}
-.btn:active{transform:scale(.98)}
-.btn:disabled{opacity:.38;cursor:not-allowed;transform:none}
-.btn-primary{background:#7f77dd;color:#fff;border-color:#7f77dd}
-.btn-primary:hover{background:#6a62cc;border-color:#6a62cc}
+.btn:hover{background:#eceae4}.btn:active{transform:scale(.98)}.btn:disabled{opacity:.38;cursor:not-allowed;transform:none}
+.btn-primary{background:#7f77dd;color:#fff;border-color:#7f77dd}.btn-primary:hover{background:#6a62cc;border-color:#6a62cc}
 .btn-sm{width:auto;padding:.5rem .9rem;font-size:.86rem}
-.btn-ghost{font-size:.82rem;color:var(--danger);border-color:#f5c4c4;background:var(--danger-bg)}
-.btn-ghost:hover{background:#fce0e0}
+.btn-ghost{font-size:.82rem;color:var(--danger);border-color:#f5c4c4;background:var(--danger-bg)}.btn-ghost:hover{background:#fce0e0}
 hr{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
 
-/* status bar */
-.status-bar{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted);margin-bottom:1rem;min-height:1.2rem}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex-shrink:0;transition:background .3s}
-.status-dot.ok{background:#1d9e75}
-.status-dot.warn{background:#ba7517;animation:blink .8s ease-in-out infinite}
-.status-dot.err{background:var(--danger)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+/* status */
+.status-bar{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted);margin-bottom:1rem;min-height:1.1rem}
+.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background .3s;background:var(--faint)}
+.sdot.ok{background:#1d9e75}.sdot.warn{background:#ba7517;animation:blink .9s ease-in-out infinite}.sdot.err{background:var(--danger)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
 /* lobby */
-.name-row{display:flex;gap:.6rem;margin-bottom:1rem}
-.name-row input{flex:1}
+.name-row{display:flex;gap:.6rem;margin-bottom:1rem}.name-row input{flex:1}
 .invite-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1.25rem}
 .inv-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
 .inv-desc{font-size:.84rem;color:#555;margin-bottom:.7rem;line-height:1.6}
 .link-row{display:flex;align-items:center;gap:.5rem}
 .link-row span{flex:1;font-size:.75rem;font-family:"Courier New",monospace;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:.35rem .6rem}
-.link-copy{flex-shrink:0;font-size:.8rem;padding:.38rem .85rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit;color:var(--text);font-weight:500;transition:background .12s}
-.link-copy:hover{background:#e5e3dc}
+.link-copy{flex-shrink:0;font-size:.8rem;padding:.38rem .85rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit;color:var(--text);font-weight:500;transition:background .12s}.link-copy:hover{background:#e5e3dc}
 .player-list{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1rem}
 .player-row{display:flex;align-items:center;gap:.65rem;padding:.55rem .8rem;border-radius:10px;font-size:.9rem}
 .player-row .p-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:var(--pc)}
@@ -112,10 +102,6 @@ hr{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
 .final-row .rank{font-size:.85rem;font-weight:700;color:var(--muted);min-width:1.6rem}
 .final-row.winner-row{background:var(--pb)}
 .btn-group{display:flex;flex-direction:column;gap:.5rem}
-
-/* toast */
-.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#181816;color:#fff;font-size:.85rem;padding:.6rem 1.2rem;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
-.toast.show{opacity:1}
 </style>
 </head>
 <body>
@@ -124,382 +110,351 @@ hr{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
   <p>Word chain — each word starts with the last letter of the previous</p>
 </header>
 <div class="card" id="app"></div>
-<div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════
-   CONSTANTS
-═══════════════════════════════════════ */
+/* ═══════════════════════════
+   CONSTANTS & HELPERS
+═══════════════════════════ */
 const MAX = 10;
-const COLORS = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9'];
-const cc = i => COLORS[i % COLORS.length];
+const CC = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9'];
+const cc = i => CC[i % CC.length];
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const lastChar = w => w[w.length-1].toLowerCase();
+const uid = () => Math.random().toString(36).slice(2,9);
+const $ = id => document.getElementById(id);
 
-/* ═══════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════ */
-function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") }
-function lastChar(w){ return w[w.length-1].toLowerCase() }
-function uid(){ return Math.random().toString(36).slice(2,10) }
-function toast(msg, ms=2500){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),ms) }
-
-/* ═══════════════════════════════════════
-   URL / ROOM
-═══════════════════════════════════════ */
-function getRoomParam(){ return new URLSearchParams(location.search).get("room") }
-function getJoinUrl(hostPeerId){ 
-  return `${location.origin}${location.pathname}?room=${hostPeerId}` 
-}
-
-/* ═══════════════════════════════════════
-   IDENTITY
-═══════════════════════════════════════ */
+/* ═══════════════════════════
+   IDENTITY & ROLE
+═══════════════════════════ */
 const myClientId = sessionStorage.getItem("s_cid") || uid();
 sessionStorage.setItem("s_cid", myClientId);
 
-/* ═══════════════════════════════════════
-   GAME STATE  (authoritative on host)
-   Synced to all peers after every change
-═══════════════════════════════════════ */
+const roomParam = new URLSearchParams(location.search).get("room");
+const amHost = !roomParam;                  // no ?room param → you are host
+let mySlot = amHost ? 0 : -1;
+let myName = "";
+
+/* ═══════════════════════════
+   GAME STATE  (host is source of truth)
+═══════════════════════════ */
 let G = {
-  phase: "lobby",     // lobby | game | over
-  players: [],        // [{cid, name, slot}]
-  turn: 0,
-  chain: [],          // [{word, slot}]
-  used: [],
-  passes: {},         // {slot: n}
-  eliminated: [],     // [slot] oldest first
-  winner: null,
-  loseReason: null
+  phase:"lobby",  players:[], turn:0,
+  chain:[], used:[], passes:{},
+  eliminated:[], winner:null, loseReason:null
 };
 
-/* ═══════════════════════════════════════
-   PEER NETWORK
-   Host: has a PeerJS ID == roomId, accepts connections
-   Guests: connect to host's PeerJS ID
-═══════════════════════════════════════ */
-let peer = null;          // our PeerJS instance
-let hostConn = null;      // guest→host connection
-let guestConns = [];      // host's connections to guests
-let amHost = false;
-let mySlot = -1;          // colour slot (0 = host)
-let statusMsg = "Connecting…";
-let statusClass = "warn";
+/* ═══════════════════════════
+   NETWORK
+═══════════════════════════ */
+let peer = null;
+let guestConns = [];   // host side: open connections to guests
+let hostConn   = null; // guest side: connection to host
 
-function setStatus(msg, cls){
-  statusMsg = msg; statusClass = cls;
-  const dot = document.getElementById("sdot");
-  const lbl = document.getElementById("slbl");
-  if(dot){ dot.className = "status-dot " + cls; }
-  if(lbl){ lbl.textContent = msg; }
+/* Helpers ─────────────────── */
+function send(conn, obj) {
+  try { if(conn && conn.open) conn.send(JSON.stringify(obj)); } catch(e){}
 }
 
-/* Broadcast state to all guests (host only) */
-function broadcast(obj){
-  const msg = JSON.stringify(obj);
-  guestConns.forEach(c => { try{ c.send(msg) } catch(e){} });
+function broadcast(obj) {
+  const s = JSON.stringify(obj);
+  guestConns.forEach(c => { try { if(c.open) c.send(s); } catch(e){} });
 }
 
-/* Send to host (guest only) */
-function sendToHost(obj){
-  if(hostConn && hostConn.open) hostConn.send(JSON.stringify(obj));
-}
-
-/* Host pushes full state to everyone */
-function pushState(){
+/* Host: push authoritative state to all guests, then re-render */
+function pushState() {
   broadcast({ type:"state", G });
   render();
 }
 
-/* Handle incoming message */
-function handleMsg(raw, fromConn){
-  let msg;
-  try { msg = JSON.parse(raw) } catch{ return }
+/* Guest: send action to host */
+function sendToHost(obj) { send(hostConn, obj); }
 
-  if(amHost){
-    // Messages from guests → process and re-broadcast
-    if(msg.type === "join"){
-      const alreadyIn = G.players.find(p => p.cid === msg.cid);
-      if(alreadyIn || G.players.length >= MAX) return;
+/* ═══════════════════════════
+   STATUS BAR
+═══════════════════════════ */
+let _statusMsg = "Connecting…";
+let _statusCls = "warn";
+
+function setStatus(msg, cls) {
+  _statusMsg = msg; _statusCls = cls;
+  const dot = $("sdot"), lbl = $("slbl");
+  if(dot) { dot.className = "sdot " + cls; }
+  if(lbl) { lbl.textContent = msg; }
+}
+
+function statusBarHTML() {
+  return `<div class="status-bar"><div class="sdot ${_statusCls}" id="sdot"></div><span id="slbl">${esc(_statusMsg)}</span></div>`;
+}
+
+/* ═══════════════════════════
+   MESSAGE HANDLER
+═══════════════════════════ */
+function onMessage(raw) {
+  let msg;
+  try { msg = typeof raw === "string" ? JSON.parse(raw) : raw; }
+  catch { return; }
+
+  if (amHost) {
+    /* ── Host receives from guests ── */
+    if (msg.type === "join") {
+      // Ignore if already joined or game in progress or lobby full
+      if (G.phase !== "lobby") return;
+      if (G.players.find(p => p.cid === msg.cid)) return;
+      if (G.players.length >= MAX) return;
       const slot = G.players.length;
       G.players.push({ cid: msg.cid, name: msg.name, slot });
       pushState();
-    } else if(msg.type === "action"){
+    } else if (msg.type === "action") {
       applyAction(msg.action);
     }
   } else {
-    // Message from host
-    if(msg.type === "state"){
+    /* ── Guest receives from host ── */
+    if (msg.type === "state") {
       G = msg.G;
-      // re-resolve my slot
       const me = G.players.find(p => p.cid === myClientId);
-      if(me) mySlot = me.slot;
+      if (me) mySlot = me.slot;
       render();
-    } else if(msg.type === "kicked"){
-      document.getElementById("app").innerHTML = `<div style="text-align:center;padding:2rem 0"><div style="font-size:2rem;margin-bottom:.75rem">👋</div><div style="font-weight:600">Game has ended</div><div style="color:var(--muted);font-size:.88rem;margin-top:.5rem">The host ended the game.</div><div style="margin-top:1.5rem"><a href="${location.origin+location.pathname}" style="color:#7f77dd;text-decoration:none;font-weight:500">← Start a new game</a></div></div>`;
     }
   }
 }
 
-/* Apply an action authoritatively (host only) */
-function applyAction(action){
-  if(!amHost) return;
-  if(action.type === "start"){
-    if(G.players.length < 2) return;
-    G.phase = "game"; G.turn = 0; G.chain = []; G.used = [];
-    G.passes = {}; G.eliminated = []; G.winner = null; G.loseReason = null;
-  } else if(action.type === "word"){
-    const slot = action.slot;
-    const word = action.word;
+/* ═══════════════════════════
+   PEERJS  INIT
+═══════════════════════════ */
+function initPeer(peerId, onOpen) {
+  // Use default PeerJS cloud (0.peerjs.com) — most reliable
+  peer = new Peer(peerId, { debug: 0 });
+
+  peer.on("open", id => {
+    setStatus(amHost ? "Ready — share the link below" : "Connecting to host…", "ok");
+    onOpen(id);
+  });
+
+  peer.on("error", err => {
+    // ID conflict: regenerate
+    if (err.type === "unavailable-id") {
+      peer.destroy();
+      initPeer(uid(), onOpen);
+      return;
+    }
+    setStatus("Connection error: " + err.type, "err");
+    console.warn("PeerJS error:", err);
+  });
+
+  peer.on("disconnected", () => {
+    setStatus("Reconnecting…", "warn");
+    try { peer.reconnect(); } catch(e) {}
+  });
+}
+
+/* ── HOST SETUP ── */
+function setupHost() {
+  const hostPeerId = "shiri-" + uid();
+
+  initPeer(hostPeerId, id => {
+    // Register connection handler IMMEDIATELY when peer opens —
+    // before render, before name entry, before anything.
+    peer.on("connection", conn => {
+      // Accept the connection right away, attach data handler
+      conn.on("open", () => {
+        guestConns.push(conn);
+        // Send them the current state straight away
+        send(conn, { type:"state", G });
+        const n = guestConns.length;
+        setStatus(`${n} guest${n>1?"s":""} connected`, "ok");
+        render(); // refresh share URL, player count
+      });
+
+      conn.on("data", raw => onMessage(raw));
+
+      conn.on("close", () => {
+        guestConns = guestConns.filter(c => c !== conn);
+        const n = guestConns.length;
+        setStatus(n ? `${n} guest${n>1?"s":""} connected` : "Waiting for players…", n?"ok":"warn");
+        render();
+      });
+
+      conn.on("error", () => {
+        guestConns = guestConns.filter(c => c !== conn);
+      });
+    });
+
+    render(); // show host name entry screen with correct share URL
+  });
+}
+
+/* ── GUEST SETUP ── */
+function setupGuest() {
+  const guestPeerId = "shiri-g-" + uid();
+
+  initPeer(guestPeerId, () => {
+    // Peer is ready — connect to host
+    const conn = peer.connect(roomParam, {
+      reliable: true
+      // No serialization override — let PeerJS handle it (defaults to JSON)
+    });
+    hostConn = conn;
+
+    conn.on("open", () => {
+      setStatus("Connected — sending join…", "ok");
+      // Send join immediately — myName is already set (we collected it before connecting)
+      send(conn, { type:"join", cid: myClientId, name: myName });
+    });
+
+    conn.on("data", raw => onMessage(raw));
+
+    conn.on("close", () => {
+      setStatus("Disconnected from host", "err");
+      setTimeout(() => {
+        $("app").innerHTML = disconnectedHTML("Host disconnected");
+      }, 400);
+    });
+
+    conn.on("error", e => {
+      setStatus("Connection error", "err");
+      console.warn("conn error", e);
+    });
+  });
+}
+
+/* ═══════════════════════════
+   GAME LOGIC  (host authoritative)
+═══════════════════════════ */
+function getActive() { return G.players.filter(p => !G.eliminated.includes(p.slot)); }
+function getCurrentTurn() { const a = getActive(); return a.length ? a[G.turn % a.length] : null; }
+function isMyTurn() { const ct = getCurrentTurn(); return ct && ct.cid === myClientId; }
+
+function applyAction(action) {
+  if (!amHost) return; // guests never call this directly
+
+  if (action.type === "start") {
+    if (G.players.length < 2) return;
+    Object.assign(G, { phase:"game", turn:0, chain:[], used:[], passes:{}, eliminated:[], winner:null, loseReason:null });
+
+  } else if (action.type === "word") {
+    const { word, slot, valid } = action;
     const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
-    if(req && word[0] !== req){ doEliminate(slot, "invalid"); return; }
-    if(G.used.includes(word)){ doEliminate(slot, "repeated"); return; }
-    if(!action.valid){ doEliminate(slot, "notaword"); return; }
+    if (req && word[0] !== req)  { doEliminate(slot, "invalid");  return; }
+    if (G.used.includes(word))   { doEliminate(slot, "repeated"); return; }
+    if (!valid)                  { doEliminate(slot, "notaword"); return; }
     G.chain.push({ word, slot });
     G.used.push(word);
-    const ap = getActive();
-    G.turn = (G.turn + 1) % ap.length;
-  } else if(action.type === "pass"){
-    const slot = action.slot;
-    G.passes[slot] = (G.passes[slot]||0) + 1;
-    const ap = getActive();
-    G.turn = (G.turn + 1) % ap.length;
-  } else if(action.type === "end"){
-    G.phase = "lobby"; G.chain = []; G.used = [];
-    G.passes = {}; G.eliminated = []; G.winner = null; G.loseReason = null; G.turn = 0;
-  } else if(action.type === "again"){
-    G.phase = "game"; G.turn = 0; G.chain = []; G.used = [];
-    G.passes = {}; G.eliminated = []; G.winner = null; G.loseReason = null;
+    G.turn = (G.turn + 1) % getActive().length;
+
+  } else if (action.type === "pass") {
+    G.passes[action.slot] = (G.passes[action.slot] || 0) + 1;
+    G.turn = (G.turn + 1) % getActive().length;
+
+  } else if (action.type === "end") {
+    Object.assign(G, { phase:"lobby", chain:[], used:[], passes:{}, eliminated:[], winner:null, loseReason:null, turn:0 });
+
+  } else if (action.type === "again") {
+    Object.assign(G, { phase:"game", turn:0, chain:[], used:[], passes:{}, eliminated:[], winner:null, loseReason:null });
   }
+
   pushState();
 }
 
-function doEliminate(slot, reason){
-  if(G.eliminated.includes(slot)) return;
+function doEliminate(slot, reason) {
+  if (G.eliminated.includes(slot)) return;
   G.eliminated.push(slot);
   G.loseReason = reason;
   const rem = getActive();
-  if(rem.length === 1){
+  if (rem.length <= 1) {
     G.phase = "over";
-    G.winner = rem[0].slot;
+    G.winner = rem.length ? rem[0].slot : null;
   } else {
     G.turn = G.turn % rem.length;
   }
 }
 
-function dispatchAction(action){
-  if(amHost){ applyAction(action); }
-  else { sendToHost({ type:"action", action }); }
+function dispatch(action) {
+  if (amHost) { applyAction(action); }
+  else        { sendToHost({ type:"action", action }); }
 }
 
-/* ═══════════════════════════════════════
-   PEERJS INIT
-═══════════════════════════════════════ */
-function initPeer(id){
-  // Try multiple PeerJS cloud servers for resilience
-  const configs = [
-    { host: '0.peerjs.com', path: '/', secure: true },
-    { host: 'peerjs.92k.de', path: '/', secure: true }
-  ];
-  let cfgIdx = 0;
-
-  function tryConnect(){
-    const cfg = configs[cfgIdx % configs.length];
-    peer = new Peer(id, { ...cfg, debug: 0 });
-
-    peer.on("open", peerId => {
-      setStatus("Connected", "ok");
-      if(amHost){
-        // Host: now listen for guests
-        peer.on("connection", conn => {
-          conn.on("open", () => {
-            guestConns.push(conn);
-            // Send current state immediately
-            conn.send(JSON.stringify({ type:"state", G }));
-            setStatus(`${guestConns.length} peer${guestConns.length>1?"s":""} connected`, "ok");
-          });
-          conn.on("data", raw => handleMsg(raw, conn));
-          conn.on("close", () => {
-            guestConns = guestConns.filter(c => c !== conn);
-            setStatus(`${guestConns.length} peer${guestConns.length!==1?"s":""} connected`, guestConns.length?"ok":"warn");
-          });
-          conn.on("error", () => {
-            guestConns = guestConns.filter(c => c !== conn);
-          });
-        });
-        render();
-      }
-    });
-
-    peer.on("error", err => {
-      if(err.type === "unavailable-id"){
-        // ID taken — generate new one (shouldn't happen but safe)
-        peer.destroy();
-        setTimeout(()=>{ initPeer(uid()) }, 500);
-        return;
-      }
-      setStatus("Connection error — retrying…", "err");
-      peer.destroy();
-      cfgIdx++;
-      setTimeout(tryConnect, 2000);
-    });
-
-    peer.on("disconnected", () => {
-      setStatus("Reconnecting…", "warn");
-      peer.reconnect();
-    });
-  }
-  tryConnect();
+/* ═══════════════════════════
+   DICTIONARY
+═══════════════════════════ */
+const wordCache = {};
+async function isRealWord(word) {
+  if (word in wordCache) return wordCache[word];
+  try {
+    const r = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    return (wordCache[word] = r.ok);
+  } catch { return (wordCache[word] = true); } // fail open if offline
 }
 
-function connectToHost(hostId){
-  const conn = peer.connect(hostId, { reliable: true, serialization: "raw" });
-  hostConn = conn;
-  conn.on("open", () => {
-    setStatus("Connected to host", "ok");
-    // Send join request
-    conn.send(JSON.stringify({ type:"join", cid: myClientId, name: myName }));
-  });
-  conn.on("data", raw => handleMsg(raw, conn));
-  conn.on("close", () => {
-    setStatus("Host disconnected", "err");
-    setTimeout(()=>{
-      document.getElementById("app").innerHTML = `<div style="text-align:center;padding:2rem 0"><div style="font-size:2rem;margin-bottom:.75rem">🔌</div><div style="font-weight:600">Lost connection to host</div><div style="color:var(--muted);font-size:.88rem;margin-top:.5rem">The host may have closed the game.</div><div style="margin-top:1.5rem"><a href="${location.origin+location.pathname}" style="color:#7f77dd;text-decoration:none;font-weight:500">← Start a new game</a></div></div>`;
-    }, 300);
-  });
-  conn.on("error", e => setStatus("Peer error: "+e, "err"));
-}
-
-/* ═══════════════════════════════════════
-   STARTUP
-═══════════════════════════════════════ */
-const roomParam = getRoomParam();
-let myName = ""; // set when user enters it
-
-if(!roomParam){
-  // I am the host
-  amHost = true;
-  mySlot = 0;
-  const hostId = "shiri-" + uid();
-  setStatus("Connecting…", "warn");
-  initPeer(hostId);
-  // Don't add self to G.players yet — wait for name entry
-} else {
-  // I am a guest — need to enter name first, then connect
-  amHost = false;
-  setStatus("Connecting to room…", "warn");
-  // Create a random peer ID for ourselves
-  const guestId = "shiri-g-" + uid();
-  initPeer(guestId);
-  // Connect to host after peer is open (handled in open event via render flow)
-}
-
-/* ═══════════════════════════════════════
-   GAME HELPERS
-═══════════════════════════════════════ */
-function getActive(){ return G.players.filter(p => !G.eliminated.includes(p.slot)) }
-function getCurrentTurn(){ const a=getActive(); return a.length ? a[G.turn % a.length] : null }
-function isMyTurn(){ const ct=getCurrentTurn(); return ct && ct.cid===myClientId }
-
-/* ═══════════════════════════════════════
+/* ═══════════════════════════
    RENDER
-═══════════════════════════════════════ */
-function render(){
-  const el = document.getElementById("app");
-  const inGame = G.phase === "game" || G.phase === "over";
+═══════════════════════════ */
+function render() {
+  const app = $("app");
   const me = G.players.find(p => p.cid === myClientId);
 
-  // Guest hasn't entered name yet
-  if(!amHost && !me && G.phase === "lobby"){
-    el.innerHTML = guestJoinHTML();
-    bindGuestJoin();
-    return;
-  }
-  // Host hasn't entered name yet
-  if(amHost && !me && G.phase === "lobby"){
-    el.innerHTML = hostJoinHTML();
-    bindHostJoin();
+  // Name entry screens — shown before player is in the game
+  if (!me) {
+    app.innerHTML = amHost ? hostEntryHTML() : guestEntryHTML();
+    bindEntry();
     return;
   }
 
-  if(G.phase === "lobby") el.innerHTML = lobbyHTML();
-  else if(G.phase === "game") el.innerHTML = gameHTML();
-  else el.innerHTML = overHTML();
+  if (G.phase === "lobby") app.innerHTML = lobbyHTML();
+  else if (G.phase === "game") app.innerHTML = gameHTML();
+  else app.innerHTML = overHTML();
   bind();
 }
 
-/* ─── HOST NAME ENTRY ─── */
-function hostJoinHTML(){
+/* ── Name entry: host ── */
+function hostEntryHTML() {
+  const shareUrl = peer && peer.id ? getJoinUrl(peer.id) : "…generating link…";
   return `
-    <div class="status-bar"><div class="status-dot ${statusClass}" id="sdot"></div><span id="slbl">${esc(statusMsg)}</span></div>
-    <div class="eyebrow">New Game — Your Name</div>
+    ${statusBarHTML()}
+    <div class="eyebrow">New Game — Step 1</div>
     <div class="rules">
-      <b>How to play:</b> Players chain words where each word starts with the <b>last letter</b>
-      of the previous. Words are dictionary-checked. Wrong letter, repeat, or fake word
-      = eliminated. Last one standing wins. Each player gets <b>1 pass</b>.
+      <b>How to play:</b> Players take turns chaining words. Each word must start with
+      the <b>last letter</b> of the previous, and be a real dictionary word.
+      Wrong letter, repeat, or fake word = <b>eliminated</b>. Last one standing wins.
+      Each player gets <b>1 pass</b>.
     </div>
     <div class="name-row">
-      <input type="text" id="host-name" placeholder="Your name (you are the host)" maxlength="20" autofocus>
-      <button class="btn btn-primary btn-sm" id="host-join-btn">Continue</button>
+      <input type="text" id="entry-name" placeholder="Your name (you are the host)" maxlength="20" autofocus>
+      <button class="btn btn-primary btn-sm" id="entry-btn">Continue</button>
+    </div>
+    <div class="invite-box" style="margin-top:.5rem">
+      <div class="inv-label">Your invite link (share now — works immediately)</div>
+      <div class="link-row">
+        <span id="share-url">${esc(shareUrl)}</span>
+        <button class="link-copy" id="copy-btn">Copy</button>
+      </div>
+      <div class="waiting-row"><div class="pulse"></div>Guests can join while you set up</div>
     </div>`;
 }
 
-function bindHostJoin(){
-  const go = () => {
-    const n = document.getElementById("host-name").value.trim();
-    if(!n) return;
-    myName = n;
-    mySlot = 0;
-    G.players.push({ cid: myClientId, name: n, slot: 0 });
-    render();
-  };
-  document.getElementById("host-join-btn").onclick = go;
-  document.getElementById("host-name").onkeydown = e => { if(e.key==="Enter") go() };
-}
-
-/* ─── GUEST NAME ENTRY ─── */
-function guestJoinHTML(){
+/* ── Name entry: guest ── */
+function guestEntryHTML() {
   return `
-    <div class="status-bar"><div class="status-dot ${statusClass}" id="sdot"></div><span id="slbl">${esc(statusMsg)}</span></div>
+    ${statusBarHTML()}
     <div class="eyebrow">Join Game</div>
     <div class="name-row">
-      <input type="text" id="guest-name" placeholder="Enter your name to join" maxlength="20" autofocus>
-      <button class="btn btn-primary btn-sm" id="guest-join-btn">Join</button>
+      <input type="text" id="entry-name" placeholder="Your name" maxlength="20" autofocus>
+      <button class="btn btn-primary btn-sm" id="entry-btn">Join →</button>
     </div>`;
 }
 
-function bindGuestJoin(){
-  const go = () => {
-    const n = document.getElementById("guest-name").value.trim();
-    if(!n){ document.getElementById("guest-name").focus(); return; }
-    myName = n;
-    // Connect to host now
-    if(peer && peer.open){
-      connectToHost(roomParam);
-    } else {
-      // Wait for peer to open
-      const chk = setInterval(()=>{
-        if(peer && peer.open){ clearInterval(chk); connectToHost(roomParam); }
-      }, 200);
-    }
-    setStatus("Joining room…","warn");
-    document.getElementById("guest-join-btn").disabled = true;
-    document.getElementById("guest-name").disabled = true;
-  };
-  document.getElementById("guest-join-btn").onclick = go;
-  document.getElementById("guest-name").onkeydown = e => { if(e.key==="Enter") go() };
+function getJoinUrl(hostId) {
+  return `${location.origin}${location.pathname}?room=${hostId}`;
 }
 
-/* ─── LOBBY ─── */
-function lobbyHTML(){
-  const isHost = amHost;
-  const canStart = isHost && G.players.length >= 2;
-  const hostPeerId = peer ? peer.id : "";
-  const shareUrl = hostPeerId ? getJoinUrl(hostPeerId) : "Connecting…";
+/* ── Lobby ── */
+function lobbyHTML() {
+  const shareUrl = (amHost && peer && peer.id) ? getJoinUrl(peer.id) : "";
+  const canStart = amHost && G.players.length >= 2;
 
   const playerRows = G.players.map((p,i) => `
     <div class="player-row filled ${cc(p.slot)}">
       <div class="p-dot"></div>
-      <div class="p-name">${esc(p.name)}${p.cid===myClientId?' <span style="font-size:.75rem;opacity:.6">(you)</span>':""}</div>
+      <div class="p-name">${esc(p.name)}${p.cid===myClientId?' <span style="font-size:.74rem;opacity:.55">(you)</span>':""}</div>
       <div class="p-badge">${i===0?"Host":"Player "+(i+1)}</div>
     </div>`).join("");
 
@@ -508,42 +463,42 @@ function lobbyHTML(){
     `<div class="player-row empty">Waiting for player ${G.players.length+i+1}…</div>`
   ).join("");
 
-  const hostControls = isHost ? `
-    <button class="btn btn-primary" id="start-btn" ${canStart?"":"disabled"}>
-      ${canStart ? "Start game →" : "Need at least 2 players"}
-    </button>` : `
-    <div class="waiting-row"><div class="pulse"></div>Waiting for host to start…</div>`;
+  const hostControls = amHost
+    ? `<button class="btn btn-primary" id="start-btn" ${canStart?"":"disabled"}>
+         ${canStart ? "Start game →" : "Need at least 2 players to start"}
+       </button>`
+    : `<div class="waiting-row"><div class="pulse"></div>Waiting for host to start the game…</div>`;
 
   return `
-    <div class="status-bar"><div class="status-dot ${statusClass}" id="sdot"></div><span id="slbl">${esc(statusMsg)}</span></div>
+    ${statusBarHTML()}
     <div class="eyebrow">Game Lobby</div>
-    <div class="rules"><b>How to play:</b> Each word must start with the <b>last letter</b> of the previous.
-    Words are dictionary-checked. Wrong letter, repeat, or non-word = <b>eliminated</b>.
-    Last player standing wins. Each player gets <b>1 pass</b>.</div>
     <div class="player-list">${playerRows}${emptyRows}</div>
-    <div class="slots-note">${G.players.length} / ${MAX} players · ${MAX-G.players.length} slots open</div>
+    <div class="slots-note">${G.players.length} / ${MAX} players joined</div>
+    ${shareUrl ? `
     <div class="invite-box">
-      <div class="inv-label">Invite players</div>
-      <div class="inv-desc">Share this link — anyone who opens it joins your room live.</div>
+      <div class="inv-label">Invite more players</div>
+      <div class="inv-desc">Anyone who opens this link joins your room live.</div>
       <div class="link-row">
         <span id="share-url">${esc(shareUrl)}</span>
         <button class="link-copy" id="copy-btn">Copy</button>
       </div>
-      <div class="waiting-row"><div class="pulse"></div>${MAX-G.players.length} slot${MAX-G.players.length!==1?"s":""} open</div>
-    </div>
+      ${G.players.length < MAX
+        ? `<div class="waiting-row"><div class="pulse"></div>${MAX-G.players.length} slot${MAX-G.players.length!==1?"s":""} open</div>`
+        : `<div class="waiting-row" style="color:#639922">Lobby full!</div>`}
+    </div>` : ""}
     ${hostControls}`;
 }
 
-/* ─── GAME ─── */
-function gameHTML(){
+/* ── Game ── */
+function gameHTML() {
   const ct = getCurrentTurn();
   const myTurn = isMyTurn();
   const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
 
   const scoreRows = G.players.map(p => {
-    const isActive = ct && p.slot===ct.slot;
+    const isActive = ct && p.slot === ct.slot;
     const isElim = G.eliminated.includes(p.slot);
-    const words = G.chain.filter(e=>e.slot===p.slot).length;
+    const words = G.chain.filter(e => e.slot === p.slot).length;
     return `<div class="score-row ${cc(p.slot)} ${isActive?"active-turn":""} ${isElim?"eliminated":""}">
       <div class="s-dot"></div>
       <div class="s-name">${esc(p.name)}${p.cid===myClientId?' <span style="font-size:.72rem;opacity:.5">(you)</span>':""}</div>
@@ -553,10 +508,10 @@ function gameHTML(){
 
   const chainBody = !G.chain.length
     ? `<span class="chain-empty">Any word to begin…</span>`
-    : G.chain.map((e,i)=>{
-        const pl = G.players.find(p=>p.slot===e.slot);
-        return (i?`<span class="arr">›</span>`:"") +
-          `<span class="chip ${cc(e.slot)}" title="${pl?esc(pl.name):""}">${esc(e.word)}</span>`;
+    : G.chain.map((e,i) => {
+        const pl = G.players.find(p => p.slot === e.slot);
+        return (i ? `<span class="arr">›</span>` : "") +
+          `<span class="chip ${cc(e.slot)}" title="${pl ? esc(pl.name) : ""}">${esc(e.word)}</span>`;
       }).join("");
 
   const reqHTML = req
@@ -578,35 +533,39 @@ function gameHTML(){
         : `<button class="btn btn-sm" disabled>No passes left</button>`}
       <button class="btn btn-sm btn-ghost" id="end-btn">End game</button>
     </div>` : `
-    <div style="text-align:center;font-size:.88rem;color:var(--muted);margin-bottom:.75rem">
-      ⏳ Waiting for <b>${ct?esc(ct.name):"…"}</b> to play…
+    <div style="text-align:center;font-size:.88rem;color:var(--muted);padding:.5rem 0 .75rem">
+      ⏳ Waiting for <b>${ct ? esc(ct.name) : "…"}</b> to play…
     </div>
     <div class="action-row" style="justify-content:center">
       <button class="btn btn-sm btn-ghost" id="end-btn">End game</button>
     </div>`;
 
   return `
-    <div class="status-bar"><div class="status-dot ${statusClass}" id="sdot"></div><span id="slbl">${esc(statusMsg)}</span></div>
+    ${statusBarHTML()}
     <div class="scoreboard">${scoreRows}</div>
-    <div class="turn-banner ${ct?cc(ct.slot):""}"><div class="turn-dot"></div>${ct?esc(ct.name)+(myTurn?" — your turn!":"'s turn"):""}</div>
+    <div class="turn-banner ${ct ? cc(ct.slot) : ""}">
+      <div class="turn-dot"></div>
+      ${ct ? esc(ct.name) + (myTurn ? " — your turn!" : "'s turn") : ""}
+    </div>
     <div class="chain-label">Word chain — ${G.chain.length} word${G.chain.length!==1?"s":""}</div>
     <div class="chain-wrap">${chainBody}</div>
-    ${reqHTML}${inputSection}`;
+    ${reqHTML}
+    ${inputSection}`;
 }
 
-/* ─── OVER ─── */
-function overHTML(){
+/* ── Game over ── */
+function overHTML() {
   const loserOrder = [...G.eliminated].reverse();
-  const ranking = G.winner!==null ? [G.winner,...loserOrder] : loserOrder;
-  const wp = G.players.find(p=>p.slot===G.winner);
-  const fp = G.eliminated.length ? G.players.find(p=>p.slot===G.eliminated[0]) : null;
-  const whyMap = {invalid:"wrong starting letter",repeated:"repeated a word",notaword:"not a real word",passed:"no passes left"};
+  const ranking = G.winner !== null ? [G.winner, ...loserOrder] : loserOrder;
+  const wp = G.players.find(p => p.slot === G.winner);
+  const fp = G.eliminated.length ? G.players.find(p => p.slot === G.eliminated[0]) : null;
+  const whyMap = { invalid:"wrong starting letter", repeated:"repeated a word", notaword:"not a real word" };
 
-  const rows = ranking.map((slot,i)=>{
-    const p = G.players.find(p=>p.slot===slot);
-    if(!p) return "";
+  const rows = ranking.map((slot,i) => {
+    const p = G.players.find(p => p.slot === slot);
+    if (!p) return "";
     const medal = ["🥇","🥈","🥉"][i] || `${i+1}.`;
-    const words = G.chain.filter(e=>e.slot===slot).length;
+    const words = G.chain.filter(e => e.slot === slot).length;
     return `<div class="final-row ${i===0?"winner-row":""} ${cc(slot)}">
       <span class="rank">${medal}</span>
       <div style="width:9px;height:9px;border-radius:50%;background:var(--pc);flex-shrink:0"></div>
@@ -616,122 +575,146 @@ function overHTML(){
   }).join("");
 
   return `
+    ${statusBarHTML()}
     <div class="over-wrap">
       <span class="trophy">🏆</span>
-      <h2>${wp?esc(wp.name):"Game over"}!</h2>
-      <p class="over-sub">${fp?esc(fp.name)+" eliminated first ("+( whyMap[G.loseReason]||"error")+").":""}<br>${G.players.length} players · ${G.chain.length} words</p>
+      <h2>${wp ? esc(wp.name) : "Game over"}!</h2>
+      <p class="over-sub">
+        ${fp ? `${esc(fp.name)} eliminated first (${whyMap[G.loseReason]||"error"}).` : ""}
+        <br>${G.players.length} players · ${G.chain.length} words played
+      </p>
       <div class="final-list">${rows}</div>
       <div class="btn-group">
-        ${amHost?`<button class="btn btn-primary" id="again-btn">Play again (same players)</button>`:""}
+        ${amHost ? `<button class="btn btn-primary" id="again-btn">Play again (same players)</button>` : ""}
         <button class="btn" id="newgame-btn">New game</button>
       </div>
     </div>`;
 }
 
-/* ═══════════════════════════════════════
-   DICTIONARY
-═══════════════════════════════════════ */
-const wordCache = {};
-async function isRealWord(word){
-  if(word in wordCache) return wordCache[word];
-  try{
-    const r = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
-    return (wordCache[word] = r.ok);
-  } catch{ return (wordCache[word] = true) }
+function disconnectedHTML(reason) {
+  return `<div style="text-align:center;padding:2rem 0">
+    <div style="font-size:2rem;margin-bottom:.75rem">🔌</div>
+    <div style="font-weight:600">${esc(reason)}</div>
+    <div style="color:var(--muted);font-size:.88rem;margin-top:.5rem">The host may have closed the tab.</div>
+    <div style="margin-top:1.5rem">
+      <a href="${location.origin+location.pathname}" style="color:#7f77dd;font-weight:500;text-decoration:none">← Start a new game</a>
+    </div>
+  </div>`;
 }
 
-function setChecking(on, word){
-  const err=document.getElementById("err");
-  const btn=document.getElementById("play-btn");
-  const wi=document.getElementById("word-input");
-  if(!err) return;
-  if(on){
-    err.innerHTML=`<div class="checking"><div class="spinner"></div>Checking "${esc(word)}"…</div>`;
-    if(btn) btn.disabled=true;
-    if(wi) wi.disabled=true;
-  } else {
-    err.innerHTML="";
-    if(btn) btn.disabled=false;
-    if(wi){ wi.disabled=false; wi.focus() }
-  }
-}
+/* ═══════════════════════════
+   BIND EVENTS
+═══════════════════════════ */
+function bindEntry() {
+  const btn = $("entry-btn");
+  const inp = $("entry-name");
+  const cb  = $("copy-btn");
 
-/* ═══════════════════════════════════════
-   BIND
-═══════════════════════════════════════ */
-function bind(){
-  const g = id => document.getElementById(id);
+  if (cb) cb.onclick = copyLink;
 
-  // Copy link (shown in lobby)
-  const cb = g("copy-btn");
-  if(cb) cb.onclick = ()=>{
-    const url = g("share-url").textContent;
-    navigator.clipboard.writeText(url)
-      .then(()=>{ cb.textContent="Copied!"; setTimeout(()=>{ if(g("copy-btn")) g("copy-btn").textContent="Copy" },1800) })
-      .catch(()=>prompt("Copy this link:",url));
+  const go = () => {
+    const name = inp ? inp.value.trim() : "";
+    if (!name) { if(inp) inp.focus(); return; }
+    myName = name;
+
+    if (amHost) {
+      // Add host to player list
+      mySlot = 0;
+      G.players.push({ cid: myClientId, name, slot: 0 });
+      // Push state so any already-connected guests get updated
+      pushState();
+    } else {
+      // Guest: connect to host now that we have a name
+      btn.disabled = true;
+      if(inp) inp.disabled = true;
+      setStatus("Connecting to host…", "warn");
+      setupGuest();
+    }
   };
 
-  if(G.phase==="lobby"){
-    const sb = g("start-btn");
-    if(sb) sb.onclick = () => dispatchAction({ type:"start" });
+  if(btn) btn.onclick = go;
+  if(inp) inp.onkeydown = e => { if(e.key === "Enter") go(); };
+}
+
+function bind() {
+  const cb = $("copy-btn");
+  if (cb) cb.onclick = copyLink;
+
+  if (G.phase === "lobby") {
+    const sb = $("start-btn");
+    if(sb) sb.onclick = () => dispatch({ type:"start" });
   }
 
-  if(G.phase==="game"){
-    const wb = g("play-btn");
-    const wi = g("word-input");
+  if (G.phase === "game") {
+    const wi = $("word-input");
+    const wb = $("play-btn");
+    const pb = $("pass-btn");
+    const eb = $("end-btn");
 
-    if(wb && wi) {
-      const doPlay = async () => {
-        const word = wi.value.trim().toLowerCase().replace(/[^a-z]/g,"");
-        const err = g("err");
-        if(!word){ if(err) err.textContent="Please enter a word."; return; }
-        if(!isMyTurn()) return;
+    const doPlay = async () => {
+      if (!wi || !isMyTurn()) return;
+      const word = wi.value.trim().toLowerCase().replace(/[^a-z]/g,"");
+      const errEl = $("err");
+      if (!word) { if(errEl) errEl.textContent = "Please enter a word."; return; }
 
-        const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
-        if(req && word[0]!==req){
-          dispatchAction({ type:"word", word, slot:mySlot, valid:false });
-          return;
-        }
-        if(G.used.includes(word)){
-          dispatchAction({ type:"word", word, slot:mySlot, valid:false });
-          return;
-        }
+      const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
+      if (req && word[0] !== req) { dispatch({ type:"word", word, slot:mySlot, valid:false }); return; }
+      if (G.used.includes(word))  { dispatch({ type:"word", word, slot:mySlot, valid:false }); return; }
 
-        setChecking(true, word);
-        const valid = await isRealWord(word);
-        setChecking(false, word);
+      // Dictionary check
+      if(wb) wb.disabled = true;
+      if(wi) wi.disabled = true;
+      if(errEl) errEl.innerHTML = `<div class="checking"><div class="spinner"></div>Checking "${esc(word)}"…</div>`;
+      const valid = await isRealWord(word);
+      if(wb) wb.disabled = false;
+      if(wi) { wi.disabled = false; wi.focus(); }
+      if(errEl) errEl.innerHTML = "";
 
-        if(!valid){
-          const e2=g("err");
-          if(e2) e2.textContent=`"${word}" isn't in the dictionary!`;
-          setTimeout(()=>dispatchAction({ type:"word", word, slot:mySlot, valid:false }),900);
-          return;
-        }
-        dispatchAction({ type:"word", word, slot:mySlot, valid:true });
-      };
-      wb.onclick = doPlay;
-      wi.onkeydown = e => { if(e.key==="Enter") doPlay() };
-    }
+      if (!valid) {
+        if(errEl) errEl.textContent = `"${word}" isn't in the dictionary!`;
+        setTimeout(() => dispatch({ type:"word", word, slot:mySlot, valid:false }), 900);
+        return;
+      }
+      dispatch({ type:"word", word, slot:mySlot, valid:true });
+    };
 
-    const pb = g("pass-btn");
-    if(pb) pb.onclick = () => { if(isMyTurn()) dispatchAction({ type:"pass", slot:mySlot }) };
-
-    const eb = g("end-btn");
-    if(eb) eb.onclick = () => { if(confirm("End the game for everyone?")) dispatchAction({ type:"end" }) };
+    if(wb) wb.onclick = doPlay;
+    if(wi) wi.onkeydown = e => { if(e.key==="Enter") doPlay(); };
+    if(pb) pb.onclick = () => { if(isMyTurn()) dispatch({ type:"pass", slot:mySlot }); };
+    if(eb) eb.onclick = () => { if(confirm("End the game for everyone?")) dispatch({ type:"end" }); };
   }
 
-  if(G.phase==="over"){
-    const ab = g("again-btn");
-    if(ab) ab.onclick = () => dispatchAction({ type:"again" });
-    const nb = g("newgame-btn");
-    if(nb) nb.onclick = () => { location.href = location.origin + location.pathname };
+  if (G.phase === "over") {
+    const ab = $("again-btn");
+    const nb = $("newgame-btn");
+    if(ab) ab.onclick = () => dispatch({ type:"again" });
+    if(nb) nb.onclick = () => { location.href = location.origin + location.pathname; };
   }
 }
 
-/* ═══════════════════════════════════════
-   INIT RENDER
-═══════════════════════════════════════ */
-render();
+function copyLink() {
+  const el = $("share-url");
+  const url = el ? el.textContent : (peer && peer.id ? getJoinUrl(peer.id) : "");
+  if (!url || url === "…generating link…") return;
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      const cb = $("copy-btn");
+      if(cb) { cb.textContent = "Copied!"; setTimeout(()=>{ if($("copy-btn")) $("copy-btn").textContent="Copy"; }, 1800); }
+    })
+    .catch(() => prompt("Copy this link:", url));
+}
+
+/* ═══════════════════════════
+   START
+═══════════════════════════ */
+if (amHost) {
+  setupHost();   // sets up PeerJS + connection listener immediately
+} else {
+  // Guest: just render the name entry screen.
+  // Actual connection happens after they enter their name.
+  setStatus("Enter your name to join", "ok");
+  render();
+}
 </script>
 </body>
 </html>
