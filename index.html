@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Shiritori</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f2f1ed;
+  --surface: #ffffff;
+  --border: #e0dfd8;
+  --text: #181816;
+  --muted: #888884;
+  --faint: #c8c7c0;
+  --danger: #a32d2d;
+  --danger-bg: #fdf0f0;
+}
+
+/* Per-player colour palette — 10 colours */
+.c0  { --pc: #7f77dd; --pb: #eeedfe; --pbd: #b0a9ee; --pt: #3c3489; }
+.c1  { --pc: #1d9e75; --pb: #e1f5ee; --pbd: #5dcaa5; --pt: #0f6e56; }
+.c2  { --pc: #d85a30; --pb: #faece7; --pbd: #f0997b; --pt: #993c1d; }
+.c3  { --pc: #d4537e; --pb: #fbeaf0; --pbd: #ed93b1; --pt: #72243e; }
+.c4  { --pc: #ba7517; --pb: #faeeda; --pbd: #ef9f27; --pt: #633806; }
+.c5  { --pc: #378add; --pb: #e6f1fb; --pbd: #85b7eb; --pt: #0c447c; }
+.c6  { --pc: #639922; --pb: #eaf3de; --pbd: #97c459; --pt: #27500a; }
+.c7  { --pc: #533b9b; --pb: #eeebfa; --pbd: #a99de0; --pt: #2d1f6e; }
+.c8  { --pc: #0f7d8a; --pb: #e0f5f7; --pbd: #5dc8d3; --pt: #065960; }
+.c9  { --pc: #888780; --pb: #f1efe8; --pbd: #b4b2a9; --pt: #444441; }
+
+html, body { min-height: 100vh; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text); font-size: 16px; line-height: 1.5; }
+body { display: flex; flex-direction: column; align-items: center; padding: 2.5rem 1rem 4rem; }
+
+.site-header { text-align: center; margin-bottom: 2rem; }
+.site-header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+.site-header p { font-size: 0.9rem; color: var(--muted); }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 2rem; width: 100%; max-width: 540px; box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+
+.eyebrow { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+
+.rules { background: var(--bg); border-radius: 10px; padding: 0.9rem 1.1rem; font-size: 0.84rem; color: #555; line-height: 1.75; margin-bottom: 1.4rem; }
+.rules b { color: var(--text); font-weight: 600; }
+
+input[type="text"] { width: 100%; padding: 0.6rem 0.9rem; font-size: 1rem; border: 1px solid var(--border); border-radius: 9px; outline: none; background: var(--surface); color: var(--text); transition: border-color 0.15s, box-shadow 0.15s; font-family: inherit; }
+input[type="text"]:focus { border-color: #7f77dd; box-shadow: 0 0 0 3px rgba(127,119,221,0.15); }
+input[type="text"]:disabled { background: var(--bg); color: var(--muted); cursor: not-allowed; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.65rem 1.25rem; font-size: 0.95rem; font-weight: 500; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; transition: background 0.12s, transform 0.08s; font-family: inherit; width: 100%; }
+.btn:hover { background: #eceae4; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
+.btn-primary { background: #7f77dd; color: #fff; border-color: #7f77dd; }
+.btn-primary:hover { background: #6a62cc; border-color: #6a62cc; }
+.btn-sm { width: auto; padding: 0.5rem 0.9rem; font-size: 0.86rem; }
+.btn-ghost { font-size: 0.82rem; color: var(--danger); border-color: #f5c4c4; background: var(--danger-bg); }
+.btn-ghost:hover { background: #fce0e0; }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+/* ── Lobby ── */
+.name-row { display: flex; gap: 0.6rem; margin-bottom: 1rem; }
+.name-row input { flex: 1; }
+
+.invite-box { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 1.25rem; }
+.invite-box .inv-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.5rem; }
+.invite-box .inv-desc { font-size: 0.84rem; color: #555; margin-bottom: 0.7rem; line-height: 1.6; }
+.link-row { display: flex; align-items: center; gap: 0.5rem; }
+.link-row span { flex: 1; font-size: 0.75rem; font-family: "Courier New", monospace; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 0.35rem 0.6rem; }
+.link-copy { flex-shrink: 0; font-size: 0.8rem; padding: 0.38rem 0.85rem; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-family: inherit; color: var(--text); font-weight: 500; transition: background 0.12s; }
+.link-copy:hover { background: #e5e3dc; }
+.link-copy:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Player list in lobby */
+.player-list { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 1rem; }
+
+.player-row { display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.8rem; border-radius: 10px; font-size: 0.9rem; }
+.player-row .p-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--pc); }
+.player-row .p-name { flex: 1; font-weight: 500; }
+.player-row .p-badge { font-size: 0.72rem; font-weight: 600; color: var(--pt); background: var(--pb); border: 1px solid var(--pbd); border-radius: 20px; padding: 0.15rem 0.55rem; }
+.player-row.empty { background: var(--bg); color: var(--faint); font-style: italic; font-size: 0.85rem; }
+.player-row.filled { background: var(--pb); color: var(--pt); }
+
+/* waiting pulse */
+.waiting-row { display: flex; align-items: center; gap: 0.6rem; font-size: 0.84rem; color: var(--muted); margin-top: 0.75rem; }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: #1d9e75; animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
+
+.slots-note { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 0.75rem; }
+
+/* ── Scoreboard ── */
+.scoreboard { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem; }
+.score-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.75rem; border-radius: 9px; font-size: 0.88rem; }
+.score-row .s-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--pc); }
+.score-row .s-name { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.score-row .s-words { font-weight: 700; font-size: 1rem; color: var(--pt); }
+.score-row.active-turn { background: var(--pb); border: 1px solid var(--pbd); }
+.score-row.eliminated { opacity: 0.4; text-decoration: line-through; }
+
+/* ── Turn banner ── */
+.turn-banner { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 1rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: 0.92rem; font-weight: 600; background: var(--pb); border: 1px solid var(--pbd); color: var(--pt); }
+.turn-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--pc); }
+
+/* ── Chain ── */
+.chain-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.5rem; }
+.chain-wrap { min-height: 58px; background: var(--bg); border-radius: 10px; padding: 0.65rem 0.85rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+.chain-empty { font-size: 0.85rem; color: var(--faint); }
+.chip { font-size: 0.82rem; font-weight: 500; padding: 0.18rem 0.55rem; border-radius: 20px; border: 1px solid var(--pbd); background: var(--pb); color: var(--pt); }
+.arr { font-size: 0.68rem; color: var(--faint); }
+
+/* ── Required letter ── */
+.req-letter { text-align: center; font-size: 0.88rem; color: var(--muted); margin-bottom: 1rem; }
+.letter-badge { display: inline-block; font-size: 1.35rem; font-weight: 700; background: #eeedfe; color: #3c3489; border: 1.5px solid #b0a9ee; border-radius: 9px; padding: 0.1rem 0.7rem; margin-left: 0.4rem; line-height: 1.5; }
+
+/* ── Word input ── */
+.input-row { display: flex; gap: 0.5rem; margin-bottom: 0.45rem; }
+.error { font-size: 0.83rem; color: var(--danger); min-height: 1.2rem; text-align: center; margin-bottom: 0.5rem; }
+.checking { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.83rem; color: var(--muted); min-height: 1.2rem; margin-bottom: 0.5rem; }
+.spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: #7f77dd; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.action-row { display: flex; gap: 0.5rem; margin-bottom: 0.25rem; }
+.action-row .btn { font-size: 0.85rem; }
+
+/* ── Game over ── */
+.over-wrap { text-align: center; }
+.trophy { font-size: 2.8rem; display: block; margin-bottom: 0.65rem; }
+.over-wrap h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.35rem; }
+.over-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.4rem; line-height: 1.6; }
+.final-list { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.4rem; text-align: left; }
+.final-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.75rem; border-radius: 9px; font-size: 0.88rem; }
+.final-row .rank { font-size: 0.8rem; font-weight: 700; color: var(--muted); min-width: 1.4rem; }
+.final-row.winner-row { background: var(--pb); }
+.btn-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+/* colour helper: given index, return class name */
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>English Shiritori</h1>
+  <p>Word chain — each word starts with the last letter of the previous</p>
+</header>
+
+<div class="card" id="app"></div>
+
+<script>
+/* ─────────────────────────────────────────
+   COLOUR SYSTEM
+   ───────────────────────────────────────── */
+const COLORS = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9'];
+function cc(i) { return COLORS[i % COLORS.length]; }
+
+/* ─────────────────────────────────────────
+   HELPERS
+   ───────────────────────────────────────── */
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function lastChar(w) { return w[w.length-1].toLowerCase(); }
+
+function loadState() {
+  try { const h = location.hash.slice(1); if (h) return JSON.parse(atob(h)); } catch {}
+  return null;
+}
+function saveState(st) {
+  try { location.hash = btoa(JSON.stringify(st)); } catch {}
+}
+function makeShareUrl(st) {
+  try { const u = new URL(location.href); u.hash = btoa(JSON.stringify(st)); return u.toString(); }
+  catch { return location.href; }
+}
+
+/* ─────────────────────────────────────────
+   STATE
+   Phases:
+     "lobby"   — players joining; host (players[0]) can start when ≥2 joined
+     "game"    — playing; eliminated[] tracks who's out
+     "over"    — game done
+   
+   State shape:
+   {
+     phase: "lobby" | "game" | "over",
+     players: [ { name, slot } ],   // slot = colour index
+     mySlot: number,                // which slot THIS browser "owns"
+     turn: number,                  // index into active players
+     chain: [ { word, slot } ],
+     used: [],
+     passes: { [slot]: count },
+     eliminated: [ slot, ... ],     // order of elimination (first = lost first)
+     winner: slot | null
+   }
+   ───────────────────────────────────────── */
+
+const MAX_PLAYERS = 10;
+
+let raw = loadState();
+
+// Detect if this is a fresh open or a returning visitor
+let S;
+let amHost = false;
+let mySlot = -1;
+
+if (!raw) {
+  // Fresh open — become host (slot 0)
+  amHost = true;
+  mySlot = 0;
+  S = {
+    phase: "lobby",
+    players: [],   // host fills in name on lobby screen
+    turn: 0,
+    chain: [], used: [],
+    passes: {},
+    eliminated: [],
+    winner: null
+  };
+} else if (raw.phase === "lobby") {
+  // Someone opened a shared lobby link — join as new player
+  S = raw;
+  // Find next open slot
+  const taken = new Set(S.players.map(p => p.slot));
+  let nextSlot = 0;
+  while (taken.has(nextSlot) && nextSlot < MAX_PLAYERS) nextSlot++;
+
+  if (nextSlot >= MAX_PLAYERS) {
+    // Lobby full — just observe
+    mySlot = -1;
+    amHost = false;
+  } else {
+    mySlot = nextSlot;
+    amHost = (mySlot === 0);
+    // Don't add to players list yet — wait for them to enter name
+  }
+} else {
+  // Game or over state — restore as observer/participant
+  S = raw;
+  mySlot = raw.mySlot !== undefined ? raw.mySlot : -1;
+  amHost = (mySlot === 0);
+}
+
+/* ─────────────────────────────────────────
+   RENDER
+   ───────────────────────────────────────── */
+function render() {
+  const el = document.getElementById("app");
+  if (S.phase === "lobby") el.innerHTML = lobbyHTML();
+  else if (S.phase === "game") el.innerHTML = gameHTML();
+  else el.innerHTML = overHTML();
+  bind();
+}
+
+/* ─── LOBBY ─── */
+function lobbyHTML() {
+  const taken = new Set(S.players.map(p => p.slot));
+  const isMember = taken.has(mySlot);
+  const myPlayer = S.players.find(p => p.slot === mySlot);
+  const isHost = mySlot === 0;
+  const canStart = isHost && S.players.length >= 2;
+  const lobbyFull = S.players.length >= MAX_PLAYERS;
+
+  // Share URL — encodes current lobby state so joiners see the right players
+  const shareState = { ...S, mySlot: undefined };
+  const shareUrl = makeShareUrl(shareState);
+
+  // Player slots display
+  const playerRows = S.players.map(p => `
+    <div class="player-row filled ${cc(p.slot)}">
+      <div class="p-dot"></div>
+      <div class="p-name">${esc(p.name)}</div>
+      <div class="p-badge">${p.slot === 0 ? "Host" : "Player " + (S.players.indexOf(p)+1)}</div>
+    </div>`).join("");
+
+  const emptySlots = Math.max(0, 2 - S.players.length);
+  const emptyRows = Array(emptySlots).fill(0).map((_,i) =>
+    `<div class="player-row empty">Waiting for player ${S.players.length + i + 1}…</div>`
+  ).join("");
+
+  const joinSection = !isMember && mySlot >= 0 && !lobbyFull ? `
+    <div class="name-row">
+      <input type="text" id="join-name" placeholder="Your name" maxlength="20" autofocus>
+      <button class="btn btn-primary btn-sm" id="join-btn" style="width:auto">Join</button>
+    </div>` : "";
+
+  const startSection = isHost && isMember ? `
+    <button class="btn btn-primary" id="start-btn" ${canStart?"":"disabled"}>
+      ${canStart ? "Start game" : "Waiting for at least 2 players…"}
+    </button>` : (isMember && !isHost ? `
+    <div class="waiting-row"><div class="pulse"></div> Waiting for host to start the game…</div>` : "");
+
+  return `
+    <div class="eyebrow">Game Lobby</div>
+    <div class="rules">
+      <b>How to play:</b> Players take turns saying words. Each word must begin with
+      the <b>last letter</b> of the previous word, verified against a real dictionary.
+      Wrong letter, repeated word, or non-word = <b>eliminated</b>. Last player
+      standing wins. Each player gets <b>1 pass</b> per game.
+    </div>
+
+    <div class="player-list">
+      ${playerRows}
+      ${emptyRows}
+    </div>
+
+    <div class="slots-note">${S.players.length} / ${MAX_PLAYERS} players joined</div>
+
+    ${joinSection}
+
+    <div class="invite-box">
+      <div class="inv-label">Invite players</div>
+      <div class="inv-desc">Share this link — anyone who opens it can join the lobby (up to ${MAX_PLAYERS} players).</div>
+      <div class="link-row">
+        <span id="share-url">${esc(shareUrl)}</span>
+        <button class="link-copy" id="copy-btn">Copy link</button>
+      </div>
+      ${S.players.length < MAX_PLAYERS ? `<div class="waiting-row"><div class="pulse"></div> ${MAX_PLAYERS - S.players.length} slot${MAX_PLAYERS-S.players.length!==1?"s":""} remaining</div>` : `<div class="waiting-row" style="color:#639922">Lobby full!</div>`}
+    </div>
+
+    ${startSection}`;
+}
+
+/* ─── GAME ─── */
+function gameHTML() {
+  const activePlayers = S.players.filter(p => !S.eliminated.includes(p.slot));
+  const currentTurn = activePlayers[S.turn % activePlayers.length];
+  const req = S.chain.length ? lastChar(S.chain[S.chain.length-1].word) : null;
+  const myTurn = currentTurn && currentTurn.slot === mySlot;
+
+  // Scoreboard
+  const scoreRows = S.players.map(p => {
+    const isActive = currentTurn && p.slot === currentTurn.slot;
+    const isElim = S.eliminated.includes(p.slot);
+    const words = S.chain.filter(e => e.slot === p.slot).length;
+    return `
+      <div class="score-row ${cc(p.slot)} ${isActive?"active-turn":""} ${isElim?"eliminated":""}">
+        <div class="s-dot"></div>
+        <div class="s-name">${esc(p.name)}</div>
+        <div class="s-words">${words}</div>
+      </div>`;
+  }).join("");
+
+  // Chain
+  const chainBody = !S.chain.length
+    ? `<span class="chain-empty">Any word to begin…</span>`
+    : S.chain.map((e,i) => {
+        const player = S.players.find(p => p.slot === e.slot);
+        return (i ? `<span class="arr">›</span>` : "") +
+          `<span class="chip ${cc(e.slot)}" title="${player ? esc(player.name) : ""}">${esc(e.word)}</span>`;
+      }).join("");
+
+  const reqHTML = req
+    ? `<div class="req-letter">Must start with <span class="letter-badge">${req.toUpperCase()}</span></div>`
+    : `<div class="req-letter" style="color:var(--faint)">Any word to begin</div>`;
+
+  const canPass = currentTurn && (S.passes[currentTurn.slot] || 0) < 1;
+
+  const inputSection = myTurn ? `
+    <div class="input-row">
+      <input type="text" id="word-input" placeholder="Type a word…"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus>
+      <button class="btn btn-primary btn-sm" id="play-btn">Play</button>
+    </div>
+    <div class="error" id="err"></div>
+    <div class="action-row">
+      ${canPass
+        ? `<button class="btn btn-sm" id="pass-btn">Pass (1 remaining)</button>`
+        : `<button class="btn btn-sm" disabled>No passes left</button>`}
+      <button class="btn btn-sm btn-ghost" id="end-btn">End game</button>
+    </div>` : `
+    <div class="error" style="color:var(--muted);font-size:0.88rem;text-align:center;margin-bottom:0.5rem">
+      Waiting for ${currentTurn ? esc(currentTurn.name) : "next player"} to play…
+    </div>
+    <div class="action-row">
+      <button class="btn btn-sm btn-ghost" id="end-btn">End game</button>
+    </div>`;
+
+  return `
+    <div class="scoreboard">${scoreRows}</div>
+
+    <div class="turn-banner ${currentTurn ? cc(currentTurn.slot) : ""}">
+      <div class="turn-dot"></div>
+      ${currentTurn ? esc(currentTurn.name) + (myTurn ? " (you)" : "") + "'s turn" : ""}
+    </div>
+
+    <div class="chain-label">Word chain — ${S.chain.length} word${S.chain.length!==1?"s":""}</div>
+    <div class="chain-wrap">${chainBody}</div>
+
+    ${reqHTML}
+    ${inputSection}`;
+}
+
+/* ─── OVER ─── */
+function overHTML() {
+  // Build ranking: winner first, then eliminated in reverse order (last eliminated = 2nd)
+  const loserOrder = [...S.eliminated].reverse(); // last eliminated = highest rank
+  const winnerSlot = S.winner;
+  const ranking = [winnerSlot, ...loserOrder];
+
+  const rows = ranking.map((slot, i) => {
+    const p = S.players.find(p => p.slot === slot);
+    if (!p) return "";
+    const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}.`;
+    const words = S.chain.filter(e => e.slot === slot).length;
+    return `
+      <div class="final-row ${i===0?"winner-row":""} ${cc(slot)}">
+        <span class="rank">${medal}</span>
+        <div class="p-dot" style="width:9px;height:9px;border-radius:50%;background:var(--pc);flex-shrink:0"></div>
+        <div class="s-name" style="flex:1;font-weight:500">${esc(p.name)}</div>
+        <div style="font-size:0.82rem;color:var(--muted)">${words} word${words!==1?"s":""}</div>
+      </div>`;
+  }).join("");
+
+  const winner = S.players.find(p => p.slot === winnerSlot);
+  const loser  = S.eliminated.length ? S.players.find(p => p.slot === S.eliminated[0]) : null;
+  const whyMap = { invalid:"wrong starting letter", repeated:"repeated a word", notaword:"not a real word", passed:"no passes left" };
+  const why = whyMap[S.loseReason] || "an error";
+
+  return `
+    <div class="over-wrap">
+      <span class="trophy">🏆</span>
+      <h2>${winner ? esc(winner.name) : "Someone"} wins!</h2>
+      <p class="over-sub">${loser ? esc(loser.name) + " was eliminated first (" + why + ")." : ""}<br>
+        ${S.players.length} players · ${S.chain.length} words played</p>
+      <div class="final-list">${rows}</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="again-btn">Play again (same players)</button>
+        <button class="btn" id="newgame-btn">New game</button>
+      </div>
+    </div>`;
+}
+
+/* ─────────────────────────────────────────
+   DICTIONARY
+   ───────────────────────────────────────── */
+const wordCache = {};
+async function isRealWord(word) {
+  if (word in wordCache) return wordCache[word];
+  try {
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    return (wordCache[word] = res.ok);
+  } catch { return (wordCache[word] = true); }
+}
+
+function setChecking(on, word) {
+  const errEl = document.getElementById("err");
+  const playBtn = document.getElementById("play-btn");
+  const wi = document.getElementById("word-input");
+  if (!errEl) return;
+  if (on) {
+    errEl.innerHTML = `<div class="checking"><div class="spinner"></div> Checking "${esc(word)}"…</div>`;
+    if (playBtn) playBtn.disabled = true;
+    if (wi) wi.disabled = true;
+  } else {
+    errEl.innerHTML = "";
+    if (playBtn) playBtn.disabled = false;
+    if (wi) { wi.disabled = false; wi.focus(); }
+  }
+}
+
+/* ─────────────────────────────────────────
+   GAME LOGIC
+   ───────────────────────────────────────── */
+function activePlayers() {
+  return S.players.filter(p => !S.eliminated.includes(p.slot));
+}
+function currentTurnPlayer() {
+  const ap = activePlayers();
+  return ap[S.turn % ap.length];
+}
+
+function eliminate(slot, reason) {
+  S.eliminated.push(slot);
+  S.loseReason = reason;
+  const ap = activePlayers();
+  if (ap.length === 1) {
+    // Last one standing wins
+    S.phase = "over";
+    S.winner = ap[0].slot;
+    saveState({ ...S, mySlot });
+    render();
+  } else {
+    // Advance turn — new active set, keep turn index sensible
+    const newAp = S.players.filter(p => !S.eliminated.includes(p.slot));
+    // Turn stays at same index mod new active count
+    S.turn = S.turn % newAp.length;
+    saveState({ ...S, mySlot });
+    render();
+  }
+}
+
+async function submitWord(raw) {
+  const word = raw.trim().toLowerCase().replace(/[^a-z]/g, "");
+  const errEl = document.getElementById("err");
+  if (!word) { if (errEl) errEl.textContent = "Please enter a word."; return; }
+
+  const ct = currentTurnPlayer();
+  if (!ct || ct.slot !== mySlot) return; // not your turn
+
+  const req = S.chain.length ? lastChar(S.chain[S.chain.length-1].word) : null;
+  if (req && word[0] !== req) { eliminate(mySlot, "invalid"); return; }
+  if (S.used.includes(word))   { eliminate(mySlot, "repeated"); return; }
+
+  setChecking(true, word);
+  const valid = await isRealWord(word);
+  setChecking(false, word);
+
+  if (!valid) {
+    const e2 = document.getElementById("err");
+    if (e2) e2.textContent = `"${word}" wasn't found in the dictionary!`;
+    setTimeout(() => eliminate(mySlot, "notaword"), 1000);
+    return;
+  }
+
+  S.chain.push({ word, slot: mySlot });
+  S.used.push(word);
+  // Advance turn within active players
+  const ap = activePlayers();
+  S.turn = (S.turn + 1) % ap.length;
+  saveState({ ...S, mySlot });
+  render();
+}
+
+/* ─────────────────────────────────────────
+   BIND
+   ───────────────────────────────────────── */
+function bind() {
+  const g = id => document.getElementById(id);
+
+  /* ── LOBBY ── */
+  if (S.phase === "lobby") {
+    // Copy link
+    const copyBtn = g("copy-btn");
+    if (copyBtn) copyBtn.onclick = () => {
+      const url = g("share-url").textContent;
+      navigator.clipboard.writeText(url)
+        .then(() => { copyBtn.textContent="Copied!"; setTimeout(()=>{ if(g("copy-btn")) g("copy-btn").textContent="Copy link"; },1800); })
+        .catch(() => prompt("Copy this link:", url));
+    };
+
+    // Join button
+    const joinBtn = g("join-btn");
+    if (joinBtn) {
+      const doJoin = () => {
+        const nameInput = g("join-name");
+        const name = nameInput ? nameInput.value.trim() : "";
+        if (!name) { if (nameInput) nameInput.focus(); return; }
+        // Add self to players list
+        S.players.push({ name, slot: mySlot });
+        const shareState = { ...S, mySlot: undefined };
+        saveState({ ...shareState, mySlot });
+        render();
+      };
+      joinBtn.onclick = doJoin;
+      const ni = g("join-name");
+      if (ni) ni.onkeydown = e => { if (e.key==="Enter") doJoin(); };
+    }
+
+    // Start game (host only)
+    const startBtn = g("start-btn");
+    if (startBtn) startBtn.onclick = () => {
+      if (S.players.length < 2) return;
+      S.phase = "game";
+      S.turn = 0;
+      S.chain = [];
+      S.used = [];
+      S.passes = {};
+      S.eliminated = [];
+      S.winner = null;
+      saveState({ ...S, mySlot });
+      render();
+    };
+  }
+
+  /* ── GAME ── */
+  if (S.phase === "game") {
+    const pb = g("play-btn");
+    const wi = g("word-input");
+    if (pb) pb.onclick = () => submitWord(wi.value);
+    if (wi) wi.onkeydown = e => { if (e.key==="Enter") submitWord(wi.value); };
+
+    const passBt = g("pass-btn");
+    if (passBt) passBt.onclick = () => {
+      const ct = currentTurnPlayer();
+      if (!ct || ct.slot !== mySlot) return;
+      S.passes[mySlot] = (S.passes[mySlot] || 0) + 1;
+      const ap = activePlayers();
+      S.turn = (S.turn + 1) % ap.length;
+      saveState({ ...S, mySlot });
+      render();
+    };
+
+    const endBt = g("end-btn");
+    if (endBt) endBt.onclick = () => {
+      if (confirm("End the current game?")) {
+        S = { phase:"lobby", players: S.players, turn:0, chain:[], used:[], passes:{}, eliminated:[], winner:null };
+        saveState({ ...S, mySlot });
+        render();
+      }
+    };
+  }
+
+  /* ── OVER ── */
+  if (S.phase === "over") {
+    g("again-btn").onclick = () => {
+      S = { phase:"game", players:S.players, turn:0, chain:[], used:[], passes:{}, eliminated:[], winner:null };
+      saveState({ ...S, mySlot });
+      render();
+    };
+    g("newgame-btn").onclick = () => {
+      S = { phase:"lobby", players:[], turn:0, chain:[], used:[], passes:{}, eliminated:[], winner:null };
+      mySlot = 0; amHost = true;
+      location.hash=""; render();
+    };
+  }
+}
+
+/* ─────────────────────────────────────────
+   HASH CHANGE (live sync for same-device multi-tab testing)
+   ───────────────────────────────────────── */
+window.addEventListener("hashchange", () => {
+  const loaded = loadState();
+  if (!loaded) return;
+  if (loaded.phase === "game" || loaded.phase === "over") {
+    const prevMySlot = mySlot;
+    S = loaded;
+    mySlot = prevMySlot;
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
