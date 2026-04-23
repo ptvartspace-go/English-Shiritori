@@ -324,35 +324,49 @@ function getActive() { return G.players.filter(p => !G.eliminated.includes(p.slo
 function getCurrentTurn() { const a = getActive(); return a.length ? a[G.turn % a.length] : null; }
 function isMyTurn() { const ct = getCurrentTurn(); return ct && ct.cid === myClientId; }
 
-function applyAction(action) {
-  if (!amHost) return; // guests never call this directly
+// Host processes all actions — guests send raw actions, host validates + pushes state
+async function applyAction(action) {
+  if (!amHost) return;
 
   if (action.type === "start") {
     if (G.players.length < 2) return;
     Object.assign(G, { phase:"game", turn:0, chain:[], used:[], passes:{}, eliminated:[], winner:null, loseReason:null });
+    pushState();
 
   } else if (action.type === "word") {
-    const { word, slot, valid } = action;
+    const { word, slot } = action;
     const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
-    if (req && word[0] !== req)  { doEliminate(slot, "invalid");  return; }
-    if (G.used.includes(word))   { doEliminate(slot, "repeated"); return; }
-    if (!valid)                  { doEliminate(slot, "notaword"); return; }
+
+    // 1. Wrong starting letter?
+    if (req && word[0] !== req) { doEliminate(slot, "invalid"); pushState(); return; }
+    // 2. Already used?
+    if (G.used.includes(word))  { doEliminate(slot, "repeated"); pushState(); return; }
+    // 3. Dictionary check (host does this — single source of truth)
+    // Push a "checking" flag so all clients show a spinner
+    G.checking = word;
+    pushState();
+    const valid = await isRealWord(word);
+    G.checking = null;
+    if (!valid) { doEliminate(slot, "notaword"); pushState(); return; }
+
     G.chain.push({ word, slot });
     G.used.push(word);
     G.turn = (G.turn + 1) % getActive().length;
+    pushState();
 
   } else if (action.type === "pass") {
     G.passes[action.slot] = (G.passes[action.slot] || 0) + 1;
     G.turn = (G.turn + 1) % getActive().length;
+    pushState();
 
   } else if (action.type === "end") {
     Object.assign(G, { phase:"lobby", chain:[], used:[], passes:{}, eliminated:[], winner:null, loseReason:null, turn:0 });
+    pushState();
 
   } else if (action.type === "again") {
     Object.assign(G, { phase:"game", turn:0, chain:[], used:[], passes:{}, eliminated:[], winner:null, loseReason:null });
+    pushState();
   }
-
-  pushState();
 }
 
 function doEliminate(slot, reason) {
@@ -520,7 +534,7 @@ function gameHTML() {
 
   const canPass = ct && (G.passes[ct.slot]||0) < 1;
 
-  const inputSection = myTurn ? `
+  const inputSection = myTurn && !G.checking ? `
     <div class="input-row">
       <input type="text" id="word-input" placeholder="Your word…"
         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus>
@@ -531,6 +545,12 @@ function gameHTML() {
       ${canPass
         ? `<button class="btn btn-sm" id="pass-btn">Pass (1 left)</button>`
         : `<button class="btn btn-sm" disabled>No passes left</button>`}
+      <button class="btn btn-sm btn-ghost" id="end-btn">End game</button>
+    </div>` : G.checking ? `
+    <div class="checking" style="margin-bottom:.75rem">
+      <div class="spinner"></div>Checking "<b>${esc(G.checking)}</b>"…
+    </div>
+    <div class="action-row" style="justify-content:center">
       <button class="btn btn-sm btn-ghost" id="end-btn">End game</button>
     </div>` : `
     <div style="text-align:center;font-size:.88rem;color:var(--muted);padding:.5rem 0 .75rem">
@@ -657,25 +677,14 @@ function bind() {
       const errEl = $("err");
       if (!word) { if(errEl) errEl.textContent = "Please enter a word."; return; }
 
-      const req = G.chain.length ? lastChar(G.chain[G.chain.length-1].word) : null;
-      if (req && word[0] !== req) { dispatch({ type:"word", word, slot:mySlot, valid:false }); return; }
-      if (G.used.includes(word))  { dispatch({ type:"word", word, slot:mySlot, valid:false }); return; }
-
-      // Dictionary check
+      // Disable UI while waiting for host to validate and push new state
       if(wb) wb.disabled = true;
       if(wi) wi.disabled = true;
       if(errEl) errEl.innerHTML = `<div class="checking"><div class="spinner"></div>Checking "${esc(word)}"…</div>`;
-      const valid = await isRealWord(word);
-      if(wb) wb.disabled = false;
-      if(wi) { wi.disabled = false; wi.focus(); }
-      if(errEl) errEl.innerHTML = "";
 
-      if (!valid) {
-        if(errEl) errEl.textContent = `"${word}" isn't in the dictionary!`;
-        setTimeout(() => dispatch({ type:"word", word, slot:mySlot, valid:false }), 900);
-        return;
-      }
-      dispatch({ type:"word", word, slot:mySlot, valid:true });
+      // Send word to host — host does ALL validation (letter, repeat, dictionary)
+      // UI will re-enable when host pushes back new state via render()
+      dispatch({ type:"word", word, slot:mySlot });
     };
 
     if(wb) wb.onclick = doPlay;
